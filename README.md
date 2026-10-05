@@ -5,8 +5,8 @@
 ## 실험실
 
 - 홈페이지: `index.html`
-- Fourier: `fourier/` — 정현파 합성, 주파수 성분 찾기, 푸리에 급수
-- Convolution: `convolution/` — 연속시간 신호의 뒤집기, 이동, 곱하기, 적분
+- LAB 01 · Convolution 실험실: `convolution/` — 연속시간 신호의 뒤집기, 이동, 곱하기, 적분
+- LAB 02 · 푸리에 실험실: `fourier/` — 정현파 합성, 주파수 성분 찾기, 푸리에 급수
 
 ## 실행과 게시
 

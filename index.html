@@ -16,17 +16,17 @@
   <section id="experiments" aria-labelledby="experiments-title">
     <div class="section-heading"><h2 id="experiments-title">학습 실험실</h2><span>02 LABS</span></div>
     <article class="lab-card">
-      <div class="lab-copy"><p class="lab-number">LAB 01 <span>주파수 영역</span></p><h3>주파수 실험실</h3><p class="lab-description">복잡한 파형 속에는 어떤 정현파가 들어 있을까요? 시간 영역과 주파수 영역을 오가며 같은 신호의 두 표현을 살펴봅니다.</p>
-        <ul class="topics"><li><span>01</span> 진폭·주파수·위상 조절</li><li><span>02</span> 주파수 성분 찾기</li><li><span>03</span> 푸리에 급수로 파형 만들기</li></ul>
-        <a class="enter" href="fourier/">주파수 실험실 열기</a>
-      </div>
-      <div class="lab-visual"><div class="visual-head"><span>같은 신호, 두 가지 표현</span><span class="visual-label">x(t) ⇄ A, φ</span></div><svg id="preview" viewBox="0 0 600 320" role="img" aria-label="1 Hz 코사인과 3 Hz 위상이 π/2인 정현파의 합성 파형, 아래에는 1 Hz의 진폭 1과 3 Hz의 진폭 0.5가 표시됩니다."><title>시간 영역의 파형과 주파수 성분</title></svg><p class="visual-caption">x(t) = cos(2πt) + 0.5 cos(6πt + π/2)</p></div>
-    </article>
-    <article class="lab-card">
-      <div class="lab-copy"><p class="lab-number">LAB 02 <span>시간 영역 · LTI 시스템</span></p><h3>Convolution 실험실</h3><p class="lab-description">신호를 뒤집고 이동하면 출력은 어떻게 정해질까요? 두 신호의 곱을 적분하며 겹치는 구간과 출력의 관계를 살펴봅니다.</p>
+      <div class="lab-copy"><p class="lab-number">LAB 01 <span>시간 영역 · LTI 시스템</span></p><h3>Convolution 실험실</h3><p class="lab-description">신호를 뒤집고 이동하면 출력은 어떻게 정해질까요? 두 신호의 곱을 적분하며 겹치는 구간과 출력의 관계를 살펴봅니다.</p>
         <ul class="topics"><li><span>01</span> 뒤집기와 시간 이동</li><li><span>02</span> 곱의 부호 있는 면적과 출력</li><li><span>03</span> 사각 펄스·지수 감쇠·교환법칙</li></ul><a class="enter" href="convolution/">Convolution 실험실 열기</a>
       </div>
       <div class="lab-visual"><div class="visual-head"><span>곱의 넓이에서 출력으로</span><span class="visual-label">x ∗ h = y</span></div><svg id="convolution-preview" viewBox="0 0 600 320" role="img" aria-label="폭 1초의 두 펄스를 convolution하면 삼각형 출력이 되며, 시각 1.5초에서 겹친 길이와 출력은 0.5입니다."><title>두 사각 펄스의 convolution</title></svg><p class="visual-caption">y(t) = ∫ x(τ)h(t − τ) dτ</p></div>
+    </article>
+    <article class="lab-card">
+      <div class="lab-copy"><p class="lab-number">LAB 02 <span>주파수 영역</span></p><h3>푸리에 실험실</h3><p class="lab-description">복잡한 파형 속에는 어떤 정현파가 들어 있을까요? 시간 영역과 주파수 영역을 오가며 같은 신호의 두 표현을 살펴봅니다.</p>
+        <ul class="topics"><li><span>01</span> 진폭·주파수·위상 조절</li><li><span>02</span> 주파수 성분 찾기</li><li><span>03</span> 푸리에 급수로 파형 만들기</li></ul>
+        <a class="enter" href="fourier/">푸리에 실험실 열기</a>
+      </div>
+      <div class="lab-visual"><div class="visual-head"><span>같은 신호, 두 가지 표현</span><span class="visual-label">x(t) ⇄ A, φ</span></div><svg id="preview" viewBox="0 0 600 320" role="img" aria-label="1 Hz 코사인과 3 Hz 위상이 π/2인 정현파의 합성 파형, 아래에는 1 Hz의 진폭 1과 3 Hz의 진폭 0.5가 표시됩니다."><title>시간 영역의 파형과 주파수 성분</title></svg><p class="visual-caption">x(t) = cos(2πt) + 0.5 cos(6πt + π/2)</p></div>
     </article>
   </section>
   <aside class="learning-note"><span aria-hidden="true">∿</span><p><strong>한 번에 하나의 값만 바꿔 보세요.</strong><br>변화를 예상하고, 그래프로 확인한 뒤, 그 이유를 설명해 보세요.</p></aside>
