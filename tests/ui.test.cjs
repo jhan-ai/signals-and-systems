@@ -1,0 +1,23 @@
+/* DOM integration tests. Install jsdom outside the site, then set NODE_PATH. */
+'use strict';
+const {JSDOM,VirtualConsole}=require('jsdom'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'..'),catalog=JSON.parse(fs.readFileSync(path.join(root,'labs/catalog.json')));let checks=0,tabs=0,scenarios=0;const errors=[];
+function ok(condition,message){checks++;assert.ok(condition,message);}
+async function load(file){const vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push({file,message:e.message,stack:e.cause?.stack}));const dom=await JSDOM.fromFile(file,{runScripts:'dangerously',resources:'usable',pretendToBeVisual:true,virtualConsole:vc});await new Promise(resolve=>dom.window.addEventListener('load',resolve,{once:true}));return dom;}
+function valid(d,label){scenarios++;ok(d.querySelectorAll('svg').length>0,label+' has plots');const attrs=Array.from(d.querySelectorAll('svg path[d]')).map(n=>n.getAttribute('d')).join(' ');ok(!/NaN|Infinity/.test(attrs),label+' finite paths');ok(!/undefined|NaN/.test(d.body.textContent),label+' finite labels');const ids=[...d.querySelectorAll('[id]')].map(e=>e.id);ok(new Set(ids).size===ids.length,label+' unique IDs');for(const e of d.querySelectorAll('.ss-controls input,.ss-controls select'))ok(d.querySelector(`label[for="${e.id}"]`),label+' labeled control');}
+function input(w,el,value){el.value=String(value);el.dispatchEvent(new w.Event('input',{bubbles:true}));}
+(async()=>{
+ const home=await load(path.join(root,'index.html'));ok(home.window.document.querySelectorAll('.lab-card').length===13,'13 ordered cards');const hrefs=[...home.window.document.querySelectorAll('.lab-card .enter')].map(e=>e.getAttribute('href'));ok(hrefs.join('|')===catalog.map(l=>l.slug+'/').join('|'),'lecture ordering');for(const a of home.window.document.querySelectorAll('a[href]')){const h=a.getAttribute('href');if(h.startsWith('#'))ok(home.window.document.querySelector(h),'home anchor');else ok(fs.existsSync(path.join(root,h)),'home link '+h);}home.window.close();
+ for(const lab of catalog){const dom=await load(path.join(root,lab.slug,'index.html')),w=dom.window,d=w.document;valid(d,lab.slug);const host=d.querySelector('[data-ss-lab]');ok(host?.ssLab,lab.slug+' initialized');const count=host.querySelectorAll('.ss-tabs button').length;
+  for(let i=0;i<count;i++){host.querySelectorAll('.ss-tabs button')[i].click();tabs++;valid(d,lab.slug+' tab '+i);const config=w.SSConfigs[host.dataset.ssLab].tabs[i],before=JSON.stringify(host.ssLab.state());
+   for(const c of config.controls){const control=host.querySelector(`input[data-key="${c.key}"],select[data-key="${c.key}"]`);const values=c.type==='select'?c.options.map(o=>o[0]):[c.min,c.max];for(const value of values){input(w,control,value);valid(d,lab.slug+' '+c.key+' '+value);}}
+   host.querySelector('[data-reset]').click();ok(JSON.stringify(host.ssLab.state())===before,lab.slug+' reset restores defaults');
+   const first=host.querySelector('.ss-tabs button');first.dispatchEvent(new w.KeyboardEvent('keydown',{key:'End',bubbles:true}));ok(host.querySelectorAll('.ss-tabs button')[count-1].getAttribute('aria-selected')==='true','End key navigation');host.querySelectorAll('.ss-tabs button')[i].click();
+   if(config.animate){host.querySelector('[data-play]').click();ok(host.querySelector('[data-play]').getAttribute('aria-pressed')==='true','play start');host.querySelector('[data-play]').click();ok(host.querySelector('[data-play]').getAttribute('aria-pressed')==='false','play stop');}
+  }
+  if(lab.slug==='fourier'){d.querySelector('#tab-detect').click();ok(!d.querySelector('#panel-detect').hidden,'legacy detect tab');d.querySelector('#tab-series').click();ok(!d.querySelector('#panel-series').hidden,'legacy series tab');d.querySelector('#tab-synth').click();host.querySelector('.ss-tabs button').click();const old=host.querySelector('.ss-plot svg').textContent;input(w,d.querySelector('#dc'),1);const fresh=host.querySelector('.ss-plot svg').textContent;ok(old!==fresh,'extension follows live Fourier source');ok(w.SSFourierSource().dc===1,'live source DC');}
+  if(lab.slug==='convolution'){const before=d.querySelector('#output-value').textContent;input(w,d.querySelector('#time'),1);ok(d.querySelector('#output-value').textContent!==before,'legacy time control');d.querySelector('#swap').click();valid(d,'legacy swap');}
+  dom.window.close();console.log(lab.slug+': passed ('+count+' new tabs)');
+ }
+ ok(errors.length===0,JSON.stringify(errors));console.log(JSON.stringify({status:'passed',checks,tabs,scenarios,scriptErrors:errors},null,2));
+})().catch(e=>{console.error(e);console.error(errors);process.exitCode=1;});

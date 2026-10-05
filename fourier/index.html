@@ -8,13 +8,13 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%2310263b'/%3E%3Cpath d='M5 20Q10 0 15 20T25 20T35 20' fill='none' stroke='%235cdecf' stroke-width='3'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
   <script defer src="math.js"></script><script defer src="app.js"></script>
-</head>
+<link rel="stylesheet" href="../labs/style.css"><script defer src="../labs/math.js"></script><script defer src="../labs/ui.js"></script><script defer src="../labs/experiments.js"></script></head>
 <body>
 <a class="skip" href="#lab">실험으로 건너뛰기</a>
 <header class="topbar"><div class="brand"><a class="home-link" href="../" aria-label="신호 및 시스템 홈페이지"><span class="brandmark" aria-hidden="true">∿</span><span>신호 및 시스템</span></a><span class="brand-divider" aria-hidden="true">/</span><strong>푸리에 실험실</strong></div><a class="all-labs" href="../">실험실 목록</a></header>
 <main>
-  <div class="intro"><div><p class="eyebrow">CHAPTER 05 / FOURIER EXPLORER</p><h1>같은 신호, 다른 시선.</h1><p class="lead">파형을 움직여 보세요. 어떤 주파수가 들어 있는지 보입니다.</p></div><div class="chapter-note">시간 영역 <span aria-hidden="true">⇄</span> 주파수 영역<br><small>표현이 달라져도 신호는 같습니다.</small></div></div>
-  <nav class="tabs" role="tablist" aria-label="주파수 실험 선택">
+  <div class="intro"><div><p class="eyebrow">LAB 10 / CHAPTER 05 / FOURIER EXPLORER</p><h1>같은 신호, 다른 시선.</h1><p class="lead">파형을 움직여 보세요. 어떤 주파수가 들어 있는지 보입니다.</p></div><div class="chapter-note">시간 영역 <span aria-hidden="true">⇄</span> 주파수 영역<br><small>표현이 달라져도 신호는 같습니다.</small></div></div>
+  <p class="ss-extension-link"><a href="#extensions">추가 실험으로 이동 ↓</a></p><nav class="tabs" role="tablist" aria-label="푸리에 실험 선택">
     <button id="tab-synth" role="tab" aria-controls="panel-synth" aria-selected="true" data-tab="synth"><span>01</span> 정현파 합성</button>
     <button id="tab-detect" role="tab" aria-controls="panel-detect" aria-selected="false" tabindex="-1" data-tab="detect"><span>02</span> 주파수 성분 찾기</button>
     <button id="tab-series" role="tab" aria-controls="panel-series" aria-selected="false" tabindex="-1" data-tab="series"><span>03</span> 푸리에 급수</button>
@@ -59,7 +59,7 @@
     <details class="concept"><summary>푸리에 급수와 푸리에 변환, 무엇이 다른가요?</summary><div><p>이 실험은 <strong>주기 신호의 푸리에 급수</strong>를 다룹니다. 스펙트럼은 기본 주파수의 정수배에 놓인 이산적인 선들입니다. 비주기 신호를 다루는 푸리에 변환의 연속 스펙트럼과 구별해 주세요.</p><p>여기의 사각파·삼각파·톱니파는 Dirichlet 충분조건을 만족합니다. 연속점에서는 원래 값으로, 불연속점에서는 좌우 극한의 평균값으로 급수가 수렴합니다. 충분조건은 수렴을 보장하는 조건이며, 모든 수렴 신호가 반드시 만족해야 하는 필요조건이라는 뜻은 아닙니다.</p><p>목표 파형은 최대 크기 1, DC 0입니다. 사각파·톱니파의 불연속점에서는 목표값도 좌우 극한의 평균인 0으로 정했습니다.</p></div></details>
   </section>
   </div>
-  <footer><span>Fourier Explorer</span><span>신호및시스템 5장 · 주파수 영역 해석</span></footer>
+  <section class="ss-extension" id="extensions"><h2>강의 개념을 더 연결해 보세요.</h2><p>공통 시간 지연 · 기본 주기 · Dirichlet 충분조건</p><div id="ss-fourier" data-ss-lab="fourier-advanced"></div></section><p class="ss-source">강의자료 PDF 페이지 149–159 · LAB은 해당 주제의 첫 본문 설명 순서로 배열했습니다.</p><nav class="ss-footer" aria-label="강의 순서 탐색"><a href="../convolution/">← LAB 09 Convolution</a><a href="../filters/">LAB 11 주파수 응답과 필터 →</a></nav><footer><span>Fourier Explorer</span><span>신호및시스템 5장 · 주파수 영역 해석</span></footer>
 </main>
 <noscript><p>이 실험은 JavaScript를 활성화하면 사용할 수 있습니다.</p></noscript>
 </body></html>
