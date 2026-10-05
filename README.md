@@ -1,2 +1,29 @@
-# signals-and-systems
-Interactive Signals and Systems learning labs: Fourier analysis and convolution.
+# 신호 및 시스템 · Signals & Systems
+
+신호와 시스템의 개념을 파라미터 조절과 그래프로 배우는 독립 교육용 사이트입니다. 학생은 로그인 없이 이용할 수 있습니다.
+
+## 실험실
+
+- 홈페이지: `index.html`
+- Fourier: `fourier/` — 정현파 합성, 주파수 성분 찾기, 푸리에 급수
+- Convolution: `convolution/` — 연속시간 신호의 뒤집기, 이동, 곱하기, 적분
+
+## 실행과 게시
+
+별도 설치나 빌드 없이 `index.html`을 브라우저에서 열 수 있습니다. 외부 라이브러리나 외부 폰트를 불러오지 않습니다.
+
+GitHub Pages는 `main` 브랜치의 루트(`/`)를 게시합니다. 공개 파일을 수정해 `main`에 반영하면 사이트도 자동으로 갱신됩니다. `.nojekyll` 파일을 유지해 주세요.
+
+## 새 실험실 추가
+
+1. 예를 들어 `sampling/index.html`을 만듭니다.
+2. 홈페이지 `index.html`의 실험실 목록에 `sampling/` 링크를 추가합니다.
+3. 실험실의 홈페이지 링크는 `../`를 사용합니다. 상대 경로를 유지하면 저장소 하위 주소에서도 작동합니다.
+
+## 계산 기준과 검증
+
+Fourier는 코사인 기준 단측 진폭·위상 스펙트럼을 표시하고, 같은 주파수의 성분은 복소 진폭으로 합산합니다. 정수 Hz 신호는 0~1초에서 cos와 sin에 투영합니다. 사각파·삼각파·톱니파는 알려진 푸리에 계수를 사용합니다.
+
+Convolution은 인과적인 사각 펄스와 지수 감쇠 신호를 지원하며, 두 신호의 곱을 해석적으로 적분합니다.
+
+`node tests/math.test.cjs`로 수치 검증을 실행합니다. 검증 범위는 `tests/VERIFICATION.md`에 기록되어 있습니다.
