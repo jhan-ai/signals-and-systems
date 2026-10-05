@@ -1,7 +1,7 @@
 'use strict';
 const M=window.FourierMath;
 const $=id=>document.getElementById(id);
-const colors=['#007d9e','#c23c71','#b27710'];
+const colors=['#007f9f','#c65327','#16816a'];
 const state={tab:'synth',parts:M.initial(),dc:0,showParts:true,probe:1,shape:'square',n:5,f0:1};
 let scanTimer=null;
 const fmt=(n,d=2)=>Math.abs(n)<1e-9?'0':Number(n.toFixed(d)).toString().replace('-','−');
@@ -34,7 +34,7 @@ function chart(id,{xmin=0,xmax=2,ymin=-2,ymax=2,xticks=[0,.5,1,1.5,2],yticks=[-2
   if(xlabel)svg.append(el('text',{x:w-right,y:h-3,'text-anchor':'end',class:'axis-label'},xlabel));
   if(ylabel)svg.append(el('text',{x:7,y:12,class:'axis-label'},ylabel));
   const layer=el('g',{'clip-path':`url(#clip-${id})`});svg.append(layer);host.replaceChildren(svg);
-  function path(fn,stroke='#102b43',width=2.6,{dash='',opacity=1,samples=Math.max(600,Math.ceil(pw*2))}={}){
+  function path(fn,stroke='#45505b',width=2.6,{dash='',opacity=1,samples=Math.max(600,Math.ceil(pw*2))}={}){
     let d='';for(let i=0;i<=samples;i++){const x=xmin+(xmax-xmin)*i/samples;d+=(i===0?'M':'L')+X(x).toFixed(2)+','+Y(fn(x)).toFixed(2);}
     layer.append(el('path',{d,fill:'none',stroke,'stroke-width':width,'stroke-dasharray':dash,opacity,'stroke-linejoin':'round','stroke-linecap':'round'}));
   }
@@ -43,7 +43,7 @@ function chart(id,{xmin=0,xmax=2,ymin=-2,ymax=2,xticks=[0,.5,1,1.5,2],yticks=[-2
     for(const sign of [1,-1]){
       let d=`M${X(xmin)},${Y(0)}`;
       for(let i=0;i<=n;i++){const x=xmin+(xmax-xmin)*i/n, val=fn(x);d+=`L${X(x).toFixed(2)},${Y(sign===1?Math.max(0,val):Math.min(0,val)).toFixed(2)}`;}
-      d+=`L${X(xmax)},${Y(0)}Z`;layer.append(el('path',{d,fill:sign===1?'#13a58d':'#dc6695','fill-opacity':'.20'}));
+      d+=`L${X(xmax)},${Y(0)}Z`;layer.append(el('path',{d,fill:sign===1?'#16816a':'#c65327','fill-opacity':'.20'}));
     }
   }
   function stem(x,y,color,label){
@@ -60,9 +60,9 @@ function signalEquation(){
   return 'x(t) = '+(pieces.length?pieces.join(' + '):'0');
 }
 function buildControls(){
-  $('component-controls').innerHTML=state.parts.map((p,i)=>`<div class="component component-${i+1} ${p.on?'':'off'}" id="component-${i}"><div class="component-title"><label><input id="enabled-${i}" type="checkbox" data-part="${i}" data-prop="on" ${p.on?'checked':''}>정현파 ${i+1}</label><span class="component-tag">${['청록','분홍','황토'][i]}</span></div><div class="sliders">${[
+  $('component-controls').innerHTML=state.parts.map((p,i)=>`<div class="component component-${i+1} ${p.on?'':'off'}" id="component-${i}"><div class="component-title"><label><input id="enabled-${i}" type="checkbox" data-part="${i}" data-prop="on" ${p.on?'checked':''}>sinusoid ${i+1}</label><span class="component-tag">${['파랑','주황','초록'][i]}</span></div><div class="sliders">${[
     ['a','진폭 A',0,2,.1,p.a,fmt(p.a,1)],['f','주파수 f',1,10,1,p.f,p.f+' Hz'],['p','위상 φ',-12,12,1,p.p,pi(M.phase(p.p))+' rad']
-  ].map(([prop,label,min,max,step,val,out])=>`<div class="control-row"><label for="part-${i}-${prop}">${label}<output id="value-${i}-${prop}">${out}</output></label><input id="part-${i}-${prop}" type="range" min="${min}" max="${max}" step="${step}" value="${val}" data-part="${i}" data-prop="${prop}" aria-label="정현파 ${i+1} ${label}" ${p.on?'':'disabled'}></div>`).join('')}</div></div>`).join('');
+  ].map(([prop,label,min,max,step,val,out])=>`<div class="control-row"><label for="part-${i}-${prop}">${label}<output id="value-${i}-${prop}">${out}</output></label><input id="part-${i}-${prop}" type="range" min="${min}" max="${max}" step="${step}" value="${val}" data-part="${i}" data-prop="${prop}" aria-label="sinusoid ${i+1} ${label}" ${p.on?'':'disabled'}></div>`).join('')}</div></div>`).join('');
 }
 function setPreset(name){
   state.parts=M.initial();state.dc=0;
@@ -77,7 +77,7 @@ function renderSpectrum(id,{phase=false,selected=null}={}){
   const a=chart(id,{xmin:-.35,xmax:10.6,ymin:phase?-Math.PI*1.35:Math.min(-.06*max,state.dc<0?state.dc*1.35:-.06*max),ymax:phase?Math.PI*1.4:max,xticks:[0,1,2,3,4,5,6,7,8,9,10],yticks:phase?[-Math.PI,0,Math.PI]:state.dc<0?[state.dc,0,max/2,max]:[0,max/2,max],xlabel:'f (Hz)',tickY:phase?pi:fmt,title:phase?'코사인 기준 위상 스펙트럼, 단위 라디안':'단측 진폭 스펙트럼, DC는 부호 있는 평균값'});
   if(selected!==null){
     a.layer.append(el('rect',{x:a.X(selected)-13,y:a.top,width:26,height:a.h-a.bottom-a.top,fill:'#dceef4',rx:5}));
-    a.layer.append(el('line',{x1:a.X(selected),x2:a.X(selected),y1:a.top,y2:a.h-a.bottom,stroke:'#007d9e','stroke-dasharray':'3 4','stroke-width':1}));
+    a.layer.append(el('line',{x1:a.X(selected),x2:a.X(selected),y1:a.top,y2:a.h-a.bottom,stroke:'#007f9f','stroke-dasharray':'3 4','stroke-width':1}));
   }
   data.forEach(z=>a.stem(z.f,phase?z.phi:z.a,colorFor(z.f),phase?pi(z.phi):fmt(z.a)));
   if(!phase&&Math.abs(state.dc)>1e-9)a.stem(0,state.dc,'#536a7d',fmt(state.dc));
@@ -87,7 +87,7 @@ function renderSpectrum(id,{phase=false,selected=null}={}){
   }
 }
 function renderSynth(){
-  const b=bound(),a=chart('sum-plot',{ymin:-b,ymax:b,yticks:[-b,-b/2,0,b/2,b],ylabel:'x(t)',title:'시간에 따른 합성 신호와 개별 정현파, 0초부터 2초'});
+  const b=bound(),a=chart('sum-plot',{ymin:-b,ymax:b,yticks:[-b,-b/2,0,b/2,b],ylabel:'x(t)',title:'시간에 따른 합성 신호와 개별 sinusoids, 0초부터 2초'});
   if(state.showParts)state.parts.forEach((p,i)=>{if(p.on)a.path(t=>p.a*Math.cos(M.TAU*p.f*t+M.phase(p.p)),colors[i],1.5,{opacity:.5});});
   a.path(t=>M.sample(state.parts,state.dc,t));
   $('equation').innerHTML=signalEquation();$('dc-value').textContent=fmt(state.dc,1);
@@ -117,21 +117,22 @@ function renderSeries(){
   $('term-count').innerHTML=parts.length+'<span>개</span>';
   document.querySelectorAll('[data-n]').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.n)===state.n));
   const names={square:'사각파',triangle:'삼각파',saw:'톱니파'},name=names[state.shape];
-  $('harmonic-note').textContent=state.shape==='saw'?'톱니파에는 모든 정수차 고조파가 있습니다.':`${name}에는 홀수 고조파만 있습니다.`;
+  $('harmonic-note').textContent=state.shape==='saw'?'톱니파에는 모든 정수차 harmonics가 있습니다.':`${name}에는 홀수 harmonics만 있습니다.`;
   $('series-task').textContent=state.shape==='saw'?'톱니파는 모든 차수에 성분이 있습니다. N을 하나씩 늘리며 파형이 어떻게 변하는지 보세요.':`${name}의 짝수차 계수는 0입니다. 차수를 하나 늘려도 파형이 변하지 않을 수 있습니다.`;
   const a=chart('series-plot',{xmax:maxT,xticks:[0,.5/state.f0,1/state.f0,1.5/state.f0,maxT],ymin:-1.6,ymax:1.6,yticks:[-1,0,1],ylabel:'x(t)',title:`${name} 목표 파형과 ${state.n}차까지의 푸리에 급수 합, 2주기`});
   a.path(t=>M.target(state.shape,state.f0,t),'#8fa2b1',1.7,{dash:'6 5',samples:2400});
-  a.path(t=>M.sample(parts,0,t),'#102b43',2.6,{samples:2400});
+  a.path(t=>M.sample(parts,0,t),'#45505b',2.6,{samples:2400});
   const cutoff=state.shape==='saw'?'k = 1, …, N':'k = 1, 3, …, N 이하';
   $('series-equation').innerHTML=state.shape==='square'?`x<sub>N</sub>(t) = ∑ [4/(πk)] sin(2πkf₀t) <span class="hint">(${cutoff})</span>`:state.shape==='triangle'?`x<sub>N</sub>(t) = ∑ [8(−1)<sup>(k−1)/2</sup>/(π²k²)] sin(2πkf₀t) <span class="hint">(${cutoff})</span>`:`x<sub>N</sub>(t) = ∑ [−2/(πk)] sin(2πkf₀t) <span class="hint">(${cutoff})</span>`;
   const xmax=Math.max(10,state.n+1),xTicks=state.n<=10?[0,1,3,5,7,9]:state.n<=20?[0,5,10,15,20]:[0,10,20,30,40,50];
-  const h=chart('harmonic-spectrum',{xmin:-.4,xmax:Math.max(xmax,xTicks[xTicks.length-1]+.5),ymin:-.05,ymax:1.55,xticks:xTicks,yticks:[0,.5,1,1.5],xlabel:'고조파 차수 k',title:`${name}의 ${state.n}차까지 고조파별 코사인 진폭, 실제 주파수는 k 곱하기 ${state.f0} Hz`});
-  parts.forEach(p=>h.stem(p.k,p.a,'#007d9e',parts.length<=5?fmt(p.a,3):undefined));
+  const h=chart('harmonic-spectrum',{xmin:-.4,xmax:Math.max(xmax,xTicks[xTicks.length-1]+.5),ymin:-.05,ymax:1.55,xticks:xTicks,yticks:[0,.5,1,1.5],xlabel:'harmonic 차수 k',title:`${name}의 ${state.n}차까지 harmonics별 코사인 진폭, 실제 주파수는 k 곱하기 ${state.f0} Hz`});
+  parts.forEach(p=>h.stem(p.k,p.a,'#007f9f',parts.length<=5?fmt(p.a,3):undefined));
   const lineX=h.X(state.n);h.layer.append(el('line',{x1:lineX+6,x2:lineX+6,y1:h.top,y2:h.h-h.bottom,stroke:'#b9cdd9','stroke-dasharray':'4 4'}));
   $('series-conclusion').textContent=state.shape==='triangle'?'삼각파는 낮은 차수만 더해도 원래 모양에 빠르게 가까워집니다.':'차수를 늘려도 불연속점 근처의 돌출은 완전히 사라지지 않습니다.';
-  $('series-detail').textContent=state.shape==='triangle'?'고조파의 진폭이 1/k²에 비례해 작아집니다. 기본 주파수를 바꾸면 시간축의 2주기 길이도 함께 바뀝니다.':'Gibbs 현상입니다. 돌출이 나타나는 구간은 좁아지지만, 충분히 큰 N에서 최대 초과량은 점프 크기의 약 9%로 남습니다. 불연속점 자체에서는 좌우 값의 평균으로 수렴합니다.';
+  $('series-detail').textContent=state.shape==='triangle'?'harmonics의 진폭이 1/k²에 비례해 작아집니다. 기본 주파수를 바꾸면 시간축의 2주기 길이도 함께 바뀝니다.':'Gibbs 현상입니다. 돌출이 나타나는 구간은 좁아지지만, 충분히 큰 N에서 최대 초과량은 점프 크기의 약 9%로 남습니다. 불연속점 자체에서는 좌우 값의 평균으로 수렴합니다.';
 }
-function render(){if(state.tab==='synth')renderSynth();else if(state.tab==='detect')renderDetect();else renderSeries();document.dispatchEvent(new CustomEvent('ss-fourier-change'));}
+function render(){
+  $('preset-status').hidden=$('preset').value!=='custom';if(state.tab==='synth')renderSynth();else if(state.tab==='detect')renderDetect();else renderSeries();document.dispatchEvent(new CustomEvent('ss-fourier-change'));}
 function stopScan(){if(scanTimer)clearInterval(scanTimer);scanTimer=null;$('scan').textContent='자동 탐색';$('scan').setAttribute('aria-pressed','false');}
 function setTab(tab,focus=false){
   if(!['synth','detect','series'].includes(tab))throw new Error('Unknown experiment');

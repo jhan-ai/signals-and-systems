@@ -1,12 +1,16 @@
 {
   "name": "signals-and-systems-labs",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "description": "Static, Korean interactive signals and systems teaching labs",
   "scripts": {
     "test": "node tests/math.test.cjs && node tests/extensions.test.cjs",
     "test:ui": "node tests/ui.test.cjs"
   },
-  "devDependencies": {"jsdom": "30.1.2"},
-  "engines": {"node": ">=24"}
+  "devDependencies": {
+    "jsdom": "30.1.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
 }

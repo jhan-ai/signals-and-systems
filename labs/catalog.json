@@ -1,132 +1,18 @@
 [
   {
     "number": 1,
-    "slug": "sampling",
-    "title": "샘플링",
-    "chapter": "1장 · 신호의 표현",
-    "pages": "21–24, 41",
-    "description": "연속시간의 파형을 점으로 관측하고, 양자화와 앨리어싱·복원의 차이를 살펴봅니다.",
-    "topics": "시간의 이산화 · 양자화 · sinc 복원",
+    "slug": "convolution",
+    "title": "Convolution",
+    "chapter": "4장 · 시간 영역 해석",
+    "description": "신호의 반전·이동과 곱의 적분을 통한 출력 계산",
     "advanced": false
   },
   {
     "number": 2,
-    "slug": "energy",
-    "title": "에너지·전력",
-    "chapter": "1장 · 신호의 크기",
-    "pages": "29, 32–33, 47–48",
-    "description": "관측 구간을 넓히며 에너지, 평균 전력, RMS가 어떻게 달라지는지 확인합니다.",
-    "topics": "유한 구간 · 무한 구간의 극한 · 연속/이산",
-    "advanced": false
-  },
-  {
-    "number": 3,
-    "slug": "symmetry",
-    "title": "주기와 대칭",
-    "chapter": "2장 · 신호의 성질",
-    "pages": "42–46",
-    "description": "정확한 주기를 찾고, 직접 바꾼 파형을 짝 성분과 홀 성분으로 분해합니다.",
-    "topics": "공통 주기 · 짝·홀 분해 · 정점 드래그",
-    "advanced": false
-  },
-  {
-    "number": 4,
-    "slug": "properties",
-    "title": "시스템 성질",
-    "chapter": "2장 · 시스템의 성질",
-    "pages": "50–62, 135–139",
-    "description": "입력에 먼저 연산할 때와 출력에 나중에 연산할 때를 비교해 시스템을 분류합니다.",
-    "topics": "선형성 · 시불변성 · 인과성 · 기억 · 안정성",
-    "advanced": false
-  },
-  {
-    "number": 5,
-    "slug": "signals",
-    "title": "기본 신호",
-    "chapter": "3장 · 기본 신호",
-    "pages": "69–76, 85–86",
-    "description": "계단과 램프로 펄스를 조립하고, 임펄스의 면적과 기본 신호의 연산을 확인합니다.",
-    "topics": "계단·램프 · 스위치 · 임펄스 · Sa/sinc",
-    "advanced": false
-  },
-  {
-    "number": 6,
-    "slug": "euler",
-    "title": "오일러 공식",
-    "chapter": "3장 · 복소 지수",
-    "pages": "77–84",
-    "description": "회전하는 복소 벡터를 실수부와 허수부에 투영하며 지수 신호를 이해합니다.",
-    "topics": "회전 벡터 · 위상 · 성장과 감쇠",
-    "advanced": false
-  },
-  {
-    "number": 7,
-    "slug": "transformations",
-    "title": "신호 변환",
-    "chapter": "3장 · 신호의 연산",
-    "pages": "87–94",
-    "description": "시간 반전·이동·배율을 조절하며 원 신호의 점이 어디로 옮겨가는지 따라갑니다.",
-    "topics": "좌표 대응 · 변환 순서 · 강의 예제",
-    "advanced": false
-  },
-  {
-    "number": 8,
-    "slug": "response",
-    "title": "시스템 응답",
-    "chapter": "4장 · 응답의 분해",
-    "pages": "102–103, 126–134",
-    "description": "초기조건과 입력을 따로 바꾸며 영입력·영상태 응답과 특성근을 살펴봅니다.",
-    "topics": "초기조건 · 과도·정상상태 · 1차/2차 계",
-    "advanced": false
-  },
-  {
-    "number": 9,
-    "slug": "convolution",
-    "title": "Convolution",
-    "chapter": "4장 · LTI 시스템",
-    "pages": "104–122",
-    "description": "뒤집기와 이동, 곱의 면적에서 시작해 임펄스 응답의 합과 시스템 연결까지 확장합니다.",
-    "topics": "곱의 적분 · 임펄스 응답 · Δτ · 직렬·병렬",
-    "advanced": false
-  },
-  {
-    "number": 10,
     "slug": "fourier",
     "title": "푸리에",
     "chapter": "5장 · 주파수 영역 해석",
-    "pages": "149–159",
-    "description": "정현파를 합성하고 성분을 찾으며, 시간 지연과 위상·고조파의 관계를 확인합니다.",
-    "topics": "합성·분석 · 급수 · 기본 주기 · Dirichlet 조건",
+    "description": "sinusoids 합성·분석과 푸리에 급수",
     "advanced": false
-  },
-  {
-    "number": 11,
-    "slug": "filters",
-    "title": "주파수 응답과 필터",
-    "chapter": "후속 학습",
-    "pages": "18, 156의 소개를 확장",
-    "description": "차단 주파수를 조절하고 입력의 각 주파수 성분이 얼마나 줄고 지연되는지 확인합니다.",
-    "topics": "저역통과 필터 · 진폭 응답 · 위상 응답",
-    "advanced": true
-  },
-  {
-    "number": 12,
-    "slug": "laplace-z",
-    "title": "라플라스·z 변환",
-    "chapter": "후속 학습",
-    "pages": "3의 학습 로드맵을 확장",
-    "description": "지수 신호의 변환을 직접 합산하며 극점과 수렴 영역의 의미를 살펴봅니다.",
-    "topics": "라플라스 적분 · z 급수 · ROC · 단위원",
-    "advanced": true
-  },
-  {
-    "number": 13,
-    "slug": "feedback",
-    "title": "피드백",
-    "chapter": "후속 학습",
-    "pages": "19의 연결 개념을 확장",
-    "description": "출력을 되돌려 비교하는 시스템에서 이득·극점·정상상태 오차의 관계를 살펴봅니다.",
-    "topics": "폐루프 · 극점 · 안정성 · 추종 오차",
-    "advanced": true
   }
 ]

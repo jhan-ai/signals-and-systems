@@ -1,0 +1,26 @@
+/* Palette sampled from the lecture slides: cream, slate, and muted red. */
+:root{--ink:#45505b;--muted:#59656d;--line:#dedeca;--blue:#007f9f;--pink:#c65327;--gold:#16816a;--bg:#fffddf;--paper:#fefff1;--focus:#b93233;--course-red:#b93233}
+body{background:var(--bg);color:var(--ink)}
+.topbar{background:#fffddf;border-bottom:3px solid var(--course-red)}
+.brandmark{background:var(--course-red);color:#fffddf;border-radius:7px}
+.brand{letter-spacing:0}.home-link{gap:10px}.brand-divider{color:#989d99}
+main{max-width:1400px;padding-top:30px}
+.intro{margin-bottom:18px;display:block}.eyebrow{color:var(--course-red);letter-spacing:.1em}
+h1{font-size:34px;letter-spacing:-.035em;color:#45505b}.lead{font-size:15px;margin-top:10px;color:#45505b;line-height:1.8}
+.goal-label{font-weight:700;margin-right:8px}.course-reference{font-size:13px;color:var(--muted);margin-top:7px}
+.definition{border:1px solid var(--line);border-left:4px solid var(--course-red);background:#fefff1;border-radius:0 8px 8px 0;padding:18px 22px;margin:0 0 19px;min-width:0}
+.definition h2{font-size:16px;margin-bottom:8px}.definition-formula{max-width:100%;overflow-x:auto;overflow-y:hidden;padding:7px 0 12px}.definition math{font-family:"Cambria Math","STIX Two Math",Georgia,serif;font-size:22px;width:max-content;max-width:none;margin:0 auto;color:#333b43}.definition p{font-size:13px;color:var(--muted);line-height:1.8;margin:5px 0}.definition strong{font-weight:650;color:var(--ink)}
+.coefficient-details{margin-top:9px;border-top:1px solid var(--line);padding-top:8px;font-size:13px}.coefficient-details summary{cursor:pointer;color:var(--ink);font-weight:650}.coefficient-details>div{padding-top:6px}.definition .coefficient-formula{font:17px/1.8 Georgia,serif;color:var(--ink)}
+.controls,.plot-card,.concept,.ss-controls,.ss-plot,.ss-copy,.ss-stats{background:#fefff1;border-color:var(--line);border-radius:9px}
+select,.ss-control select{background:#fffefa;border-color:#cbcfbf;color:var(--ink)}
+.text-button,.all-labs{color:var(--muted)}
+.tabs{border-bottom-color:var(--line)}.tabs button[aria-selected=true]{border-bottom-color:var(--course-red);color:var(--course-red)}.tabs button[aria-selected=true] span{background:var(--course-red);border-color:var(--course-red)}
+.tabs button span{border-color:#c8cbbb}.primary-button,.quick-buttons button[aria-pressed=true],.ss-lab .ss-tabs button[aria-selected=true],.ss-lab .ss-play{background:var(--course-red);border-color:var(--course-red);color:#fffef4}
+.quick-buttons button,.secondary-button,.ss-lab button{background:#fffefa;border-color:#d0d1bd}.process{border-color:var(--line);color:var(--ink)}.process b,.step-tag{background:#f4e8d0;color:#9c2b2c}
+.time-control{background:#f7f1d4;border-color:#ddd6b5}.observation,.ss-note{background:#f6f3df;border-color:#dfdbc3}.observation p,.ss-note p{color:var(--muted)}.observation-icon{color:var(--course-red)}.ss-note{border-left-color:var(--course-red)}
+.measurement{background:#45505b}.measurement span{color:#fffddf}.integral,.series-stat{background:#f5f2de}.source-summary{border-left-color:var(--course-red)}.overline{color:#68716e}.positive-text{color:#14765e}.negative-text{color:#af4622}.line.pink{border-color:#c65327}
+.preset-status{margin-top:10px;font-size:12px;line-height:1.65;color:#67624f;border-left:2px solid #b93233;padding-left:9px}
+.ss-lab{color:var(--ink)}.ss-lab .ss-tabs{margin-top:14px}.ss-control output{color:#007f9f}.ss-ends{color:#626a70}.ss-plot svg text{fill:#59656d}.ss-copy th,.ss-copy td{border-color:var(--line)}.ss-copy .ss-equation{color:#45505b}.ss-network>div{background:#f5f2de}.ss-extension{border-top:1px solid #cfceb8;margin-top:32px;padding-top:23px}.ss-extension>h2{font-size:23px}.ss-footer{border-color:var(--line);margin-top:25px}.ss-footer a,.ss-extension-link a{color:#9e2e2f}.ss-extension-link{font-size:13px;margin:0 0 18px}
+.course-footer{border-top:3px solid var(--course-red);color:#626a70;font-size:12px;margin-top:24px;letter-spacing:0;padding:17px 0}
+.ss-lab :focus-visible{outline-color:var(--course-red)}
+@media(max-width:780px){main{padding-top:22px}.definition{padding:15px 16px}.definition math{font-size:19px}h1{font-size:29px}.lead{font-size:14px}.course-reference{font-size:12px}.definition p{font-size:12px}.topbar{padding:12px 18px}.brand{font-size:13px}.tabs button{white-space:normal}.course-footer{gap:8px}}

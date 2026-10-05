@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const colors=['#007d9e','#c23c71','#a56800','#102b43','#6b51a4'];
+  const colors=['#007f9f','#c65327','#16816a','#45505b','#6b51a4'];
   const fmt=(x,n=3)=>Number.isFinite(x)?(Math.abs(x)>=1e5?x.toExponential(2):Number(x.toFixed(n)).toString()).replace('-','−'):'—';
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function svgNode(tag,attrs={},text){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,v);if(text!==undefined)n.textContent=text;return n;}

@@ -15,14 +15,15 @@ function chart(id,xmin,xmax,ymin,ymax,{xlabel='τ (s)',title='',yticks=[ymin,0,y
   const layer=node('g',{'clip-path':`url(#clip-${id})`});svg.append(layer);host.replaceChildren(svg);
   function points(fn,breaks=[]){const xs=Array.from({length:641},(_,i)=>xmin+(xmax-xmin)*i/640);for(const t of breaks)for(const d of [-1e-7,0,1e-7])if(t+d>=xmin&&t+d<=xmax)xs.push(t+d);xs.sort((a,b)=>a-b);return xs.map(t=>[X(t),Y(fn(t))]);}
   function line(fn,color,width=2.5,{dash='',breaks=[]}={}){const d=points(fn,breaks).map((p,i)=>(i?'L':'M')+p.map(v=>v.toFixed(2)).join(',')).join('');layer.append(node('path',{d,fill:'none',stroke:color,'stroke-width':width,'stroke-dasharray':dash,'stroke-linejoin':'round'}));}
-  function area(fn,breaks=[]){for(const sign of [1,-1]){const ps=points(t=>sign>0?Math.max(0,fn(t)):Math.min(0,fn(t)),breaks);const d=`M${X(xmin)},${Y(0)}`+ps.map(p=>'L'+p.map(v=>v.toFixed(2)).join(',')).join('')+`L${X(xmax)},${Y(0)}Z`;layer.append(node('path',{d,fill:sign>0?'#13a58d':'#dc6695','fill-opacity':'.25'}));}}
+  function area(fn,breaks=[]){for(const sign of [1,-1]){const ps=points(t=>sign>0?Math.max(0,fn(t)):Math.min(0,fn(t)),breaks);const d=`M${X(xmin)},${Y(0)}`+ps.map(p=>'L'+p.map(v=>v.toFixed(2)).join(',')).join('')+`L${X(xmax)},${Y(0)}Z`;layer.append(node('path',{d,fill:sign>0?'#16816a':'#c65327','fill-opacity':'.25'}));}}
   return {svg,layer,X,Y,line,area,w,h,l,r,top,b};
 }
 function formula(s,v){return s.kind==='rect'?`${fmt(s.amplitude)} [u(${v}) − u(${v} − ${fmt(s.width)})]`:`${fmt(s.amplitude)} e<sup>−${fmt(s.rate)}${v}</sup> u(${v})`;}
 function buildControls(){
-  $('signal-controls').innerHTML=['x','h'].map((key,i)=>{const s=state[key];return `<section class="conv-signal" style="--component:${i?'#c23c71':'#007d9e'}"><h3>${key==='x'?'입력 신호 x(t)':'임펄스 응답 h(t)'}</h3><label class="sr-only" for="${key}-kind">${key} 신호 형태</label><select id="${key}-kind" data-signal="${key}" data-property="kind"><option value="rect" ${s.kind==='rect'?'selected':''}>사각 펄스</option><option value="exp" ${s.kind==='exp'?'selected':''}>지수 감쇠</option></select><p class="formula" id="${key}-formula">${key}(t) = ${formula(s,'t')}</p><div class="control-row"><label for="${key}-amplitude">진폭 <output id="${key}-amplitude-value">${fmt(s.amplitude)}</output></label><input type="range" id="${key}-amplitude" aria-label="${key} 진폭" data-signal="${key}" data-property="amplitude" min="-2" max="2" step="0.1" value="${s.amplitude}"></div><div class="control-row"><label for="${key}-shape">${s.kind==='rect'?'펄스 폭':'감쇠율'} <output id="${key}-shape-value">${fmt(s.kind==='rect'?s.width:s.rate)} ${s.kind==='rect'?'s':'s⁻¹'}</output></label><input type="range" id="${key}-shape" aria-label="${key} ${s.kind==='rect'?'펄스 폭':'감쇠율'}" data-signal="${key}" data-property="${s.kind==='rect'?'width':'rate'}" min="0.5" max="3" step="0.1" value="${s.kind==='rect'?s.width:s.rate}"></div></section>`;}).join('');
+  $('signal-controls').innerHTML=['x','h'].map((key,i)=>{const s=state[key];return `<section class="conv-signal" style="--component:${i?'#c65327':'#007f9f'}"><h3>${key==='x'?'입력 신호 x(t)':'임펄스 응답 h(t)'}</h3><label class="sr-only" for="${key}-kind">${key} 신호 형태</label><select id="${key}-kind" data-signal="${key}" data-property="kind"><option value="rect" ${s.kind==='rect'?'selected':''}>사각 펄스</option><option value="exp" ${s.kind==='exp'?'selected':''}>지수 감쇠</option></select><p class="formula" id="${key}-formula">${key}(t) = ${formula(s,'t')}</p><div class="control-row"><label for="${key}-amplitude">진폭 <output id="${key}-amplitude-value">${fmt(s.amplitude)}</output></label><input type="range" id="${key}-amplitude" aria-label="${key} 진폭" data-signal="${key}" data-property="amplitude" min="-2" max="2" step="0.1" value="${s.amplitude}"></div><div class="control-row"><label for="${key}-shape">${s.kind==='rect'?'펄스 폭':'감쇠율'} <output id="${key}-shape-value">${fmt(s.kind==='rect'?s.width:s.rate)} ${s.kind==='rect'?'s':'s⁻¹'}</output></label><input type="range" id="${key}-shape" aria-label="${key} ${s.kind==='rect'?'펄스 폭':'감쇠율'}" data-signal="${key}" data-property="${s.kind==='rect'?'width':'rate'}" min="0.5" max="3" step="0.1" value="${s.kind==='rect'?s.width:s.rate}"></div></section>`;}).join('');
 }
 function render(){
+  $('preset-status').hidden=$('preset').value!=='custom';
   const {x,h,t}=state,end=M.endTime(x,h),left=state.showFlip?-Math.min(6,h.kind==='rect'?h.width+.5:5/h.rate):-1.25,right=end+.3;
   const amp=Math.max(.5,Math.abs(x.amplitude),Math.abs(h.amplitude))*1.3;
   const {lo,hi}=M.overlap(x,h,t),hasOverlap=hi>lo&&x.amplitude!==0&&h.amplitude!==0,y=M.convolve(x,h,t);
@@ -31,8 +32,8 @@ function render(){
   const a=chart('overlap-plot',left,right,-amp,amp,{title:`시각 ${fmt(t)}초에서 x(τ)와 h(t−τ)의 겹침`});
   if(hasOverlap)a.layer.append(node('rect',{x:a.X(lo),y:a.top,width:a.X(hi)-a.X(lo),height:a.h-a.top-a.b,fill:'#edf4f8'}));
   if(state.showFlip)a.line(tau=>M.value(h,-tau),'#8b9ca9',1.6,{dash:'5 5',breaks:[-h.width,0]});
-  a.line(tau=>M.value(x,tau),'#007d9e',2.6,{breaks:[0,x.width]});
-  a.line(tau=>M.value(h,t-tau),'#c23c71',2.6,{breaks:[t-h.width,t]});
+  a.line(tau=>M.value(x,tau),'#007f9f',2.6,{breaks:[0,x.width]});
+  a.line(tau=>M.value(h,t-tau),'#c65327',2.6,{breaks:[t-h.width,t]});
   $('shift-note').textContent=`h(−τ)를 ${Math.abs(t)<1e-10?'이동하지 않은 상태':`${fmt(Math.abs(t))}초 ${t<0?'왼쪽':'오른쪽'}으로 이동`}`;
   const product=tau=>M.value(x,tau)*M.value(h,t-tau),pa=Math.max(.5,Math.abs(x.amplitude*h.amplitude))*1.3;
   const p=chart('product-plot',left,right,-pa,pa,{title:'x(τ)h(t−τ)의 곱과 부호 있는 면적'});p.area(product,[lo,hi]);p.line(product,'#33556b',2,{breaks:[lo,hi]});
@@ -41,9 +42,9 @@ function render(){
   const bound=Math.max(.5,peak*1.25),negative=x.amplitude*h.amplitude<0;
   const ymin=negative?-bound:-.15*bound,ymax=negative?.15*bound:bound;
   const o=chart('output-plot',-1,end,ymin,ymax,{xlabel:'t (s)',title:'convolution 출력 y(t)와 현재 시각의 출력값',yticks:negative?[-bound,-bound/2,0]:[0,bound/2,bound]});
-  o.line(v=>M.convolve(x,h,v),'#102b43',2.8,{breaks:[0,x.width,h.width,x.width+h.width]});
-  o.layer.append(node('line',{x1:o.X(t),x2:o.X(t),y1:o.top,y2:o.h-o.b,stroke:'#007d9e','stroke-dasharray':'4 4','stroke-width':1.3}));
-  o.layer.append(node('circle',{cx:o.X(t),cy:o.Y(y),r:6,fill:'#007d9e',stroke:'#fff','stroke-width':2}));
+  o.line(v=>M.convolve(x,h,v),'#45505b',2.8,{breaks:[0,x.width,h.width,x.width+h.width]});
+  o.layer.append(node('line',{x1:o.X(t),x2:o.X(t),y1:o.top,y2:o.h-o.b,stroke:'#007f9f','stroke-dasharray':'4 4','stroke-width':1.3}));
+  o.layer.append(node('circle',{cx:o.X(t),cy:o.Y(y),r:6,fill:'#007f9f',stroke:'#fff','stroke-width':2}));
   $('output-formula').innerHTML=hasOverlap?`y(${fmt(t)}) = ∫<sub>${fmt(lo)}</sub><sup>${fmt(hi)}</sup> x(τ)h(${fmt(t)} − τ) dτ = <strong>${fmt(y,3)}</strong>`:`y(${fmt(t)}) = ∫ x(τ)h(${fmt(t)} − τ) dτ = 0`;
   if(!hasOverlap){$('observation-title').textContent='곱의 넓이가 0이므로 출력도 0입니다.';$('observation-detail').textContent=x.amplitude===0||h.amplitude===0?'한 신호의 진폭이 0입니다. 다른 신호가 어떤 모양이든 convolution 출력은 0입니다.':'t를 움직여 두 신호가 겹치기 시작하는 순간을 찾아보세요. 한 점에서만 닿는 경우에도 면적은 0입니다.';}
   else if(x.kind==='rect'&&h.kind==='rect'){$('observation-title').textContent=`겹치는 길이 ${fmt(hi-lo)} s × 곱의 높이 ${fmt(x.amplitude*h.amplitude)} = ${fmt(y,3)}`;$('observation-detail').textContent=x.width===h.width?'두 펄스의 폭이 같으면 출력은 삼각형입니다. 펄스 하나의 폭을 바꿔 사다리꼴이 되는 이유도 살펴보세요.':'두 펄스의 폭이 다르면 짧은 펄스가 완전히 겹치는 동안 출력이 일정해져 사다리꼴이 됩니다.';}
