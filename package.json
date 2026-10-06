@@ -4,8 +4,8 @@
   "private": true,
   "description": "Static, Korean interactive signals and systems teaching labs",
   "scripts": {
-    "test": "node tests/math.test.cjs && node tests/extensions.test.cjs",
-    "test:ui": "node tests/ui.test.cjs"
+    "test": "node tests/math.test.cjs && node tests/extensions.test.cjs && node tests/expression.test.cjs",
+    "test:ui": "node tests/ui.test.cjs && node tests/expression-ui.test.cjs"
   },
   "devDependencies": {
     "jsdom": "30.1.2"

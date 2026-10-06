@@ -34,3 +34,14 @@
 이번 검증은 수학 계산, DOM 조작 및 정적 링크 검사에 한정합니다. 실제 브라우저의 화면 캡처, 모바일 터치, MathML의 브라우저별 배치 및 애니메이션 성능 검사는 포함하지 않습니다. DOM 검증을 실제 렌더링 검증으로 간주하지 않습니다.
 
 제외한 LAB의 원본은 `archive/all-labs-2026-10-05` 브랜치에 보관하며 현재 Pages의 배포 경로에서 삭제합니다.
+
+
+## 2026-10-07: Convolution expression input
+
+- Original mathematics: 7,383 checks; Convolution extensions: 640 checks.
+- Expression mathematics: 78 checks of grammar, precedence, implicit multiplication, rejected code-like inputs, domain errors, closed-form causal/delayed ramps, shifted pulses, Gaussian convolution, narrow pulse, and the divergent bilateral-exponential example.
+- Existing DOM interaction suite: 603 checks across 55 scenarios; new expression DOM suite: 47 checks. No script errors.
+- Mode switching, retained presets, draft/apply behavior, finite-interval labels, invalid syntax/domain/bounds, swapping, playback, causal negative time, returning to presets, and reset verified in jsdom.
+- SVG paths remain finite. Fourier files are unchanged.
+- Local browser preview was blocked by the browser's network policy. DOM tests do not establish visual layout or touch behavior.
+- Arbitrary expressions use finite-interval quadrature. Step boundaries with affine arguments are split explicitly. Tail expansion and finer quadrature are diagnostics, not convergence proofs. Very high frequencies, non-affine narrow features, or singularities require care; this is not a symbolic integration engine.
