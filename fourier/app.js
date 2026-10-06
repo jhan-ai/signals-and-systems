@@ -132,7 +132,7 @@ function renderSeries(){
   $('series-detail').textContent=state.shape==='triangle'?'harmonics의 진폭이 1/k²에 비례해 작아집니다. 기본 주파수를 바꾸면 시간축의 2주기 길이도 함께 바뀝니다.':'Gibbs 현상입니다. 돌출이 나타나는 구간은 좁아지지만, 충분히 큰 N에서 최대 초과량은 점프 크기의 약 9%로 남습니다. 불연속점 자체에서는 좌우 값의 평균으로 수렴합니다.';
 }
 function render(){
-  $('preset-status').hidden=$('preset').value!=='custom';if(state.tab==='synth')renderSynth();else if(state.tab==='detect')renderDetect();else renderSeries();document.dispatchEvent(new CustomEvent('ss-fourier-change'));}
+  $('preset-status').hidden=$('preset').value!=='custom';if(state.tab==='synth')renderSynth();else if(state.tab==='detect')renderDetect();else renderSeries();}
 function stopScan(){if(scanTimer)clearInterval(scanTimer);scanTimer=null;$('scan').textContent='자동 탐색';$('scan').setAttribute('aria-pressed','false');}
 function setTab(tab,focus=false){
   if(!['synth','detect','series'].includes(tab))throw new Error('Unknown experiment');
@@ -194,6 +194,3 @@ if(document.modelContext?.registerTool){
   }});
   window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});
 }
-
-// The extension reads the same live source without changing the original controls.
-window.SSFourierSource=()=>({parts:state.parts.map(p=>({...p})),dc:state.dc});
