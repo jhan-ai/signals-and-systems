@@ -9,8 +9,8 @@ window.FourierLesson=(()=>{
  const math=s=>`<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">${row(s)}</math>`;
  const f0=sub('f',0),X=k=>sub('X',k),j=mi('j'),t=mi('t'),T=mi('T'),dt=mi('d')+t,eq=mo('='),times=mo('·');
  const exp=a=>sup(mi('e'),a),wrap=a=>mo('(')+a+mo(')');
- const exponent=k=>k===0?mn(1):exp(j+mn(2)+mi('π')+(k===1?'':k<0?wrap(mn(k)):mn(k))+f0+t);
- const basis=k=>exp(j+mn(2)+mi('π')+(typeof k==='number'?(k<0?wrap(mn(k)):mn(k)):mi(k))+f0+t);
+ const basis=k=>typeof k==='number'?(k===0?mn(1):exp((k<0?mo('−'):'')+j+mn(2)+mi('π')+(Math.abs(k)===1?f0:wrap(mn(Math.abs(k))+f0))+t)):exp(j+mn(2)+mi('π')+mi(k)+f0+t);
+ const exponent=k=>basis(k);
  const integral=(lo,hi,body)=>`<msubsup>${mo('∫')}${row(lo)}${row(hi)}</msubsup>`+body+dt;
  const sigma=(lo,hi,body)=>`<munderover>${mo('∑')}${row(lo)}${row(hi)}</munderover>`+body;
  const scalar=z=>Math.abs(z.im)<1e-9?fmt(z.re,3):`${fmt(z.re,3)} ${z.im<0?'−':'+'} j${fmt(Math.abs(z.im),3)}`;
@@ -33,7 +33,7 @@ window.FourierLesson=(()=>{
    const primitive=frac(T+exp(j+mn(2)+mi('π')+wrap(mn(q))+frac(t,T)),j+mn(2)+mi('π')+wrap(mn(q)));
    lines.push(math(eq+`<msubsup>${row(mo('[')+primitive+mo(']'))}${mn(0)}${T}</msubsup>`));
    lines.push(math(eq+frac(T,j+mn(2)+mi('π')+wrap(mn(q)))+wrap(exp(j+mn(2)+mi('π')+wrap(mn(q)))+mo('−')+mn(1))+eq+mn(0)));
-   lines.push(`<p>k−m=${q}는 0이 아닌 정수이므로 e<sup>j2π(${q})</sup>=1입니다. 따라서 한 주기에서 서로 직교합니다.</p>`);
+   lines.push(`<p>k−m=${q}이고 0이 아닌 정수이므로 e<sup>j2π(${q})</sup>=1입니다. 따라서 한 주기에서 서로 직교합니다.</p>`);
   }
   const weighted=F.scale(z,F.basisInner(k,m,period));
   lines.push(`<p class="proof-result">원래 성분의 계수 X<sub>${k}</sub>까지 곱한 결과: <strong>${scalar(weighted)}</strong>${q===0?' (= X'+k+'T)':''}</p>`);

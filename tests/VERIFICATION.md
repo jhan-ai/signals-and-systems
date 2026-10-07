@@ -68,3 +68,5 @@ This revision supersedes the earlier Fourier interactive design described above.
 - `fourier-advanced-ui.test.cjs`: 58 checks for deletion, lecture-only explanations, 0/T cases, normalization, absent and negative coefficients, DC, source linkage, example switching, spectrum phase, partial versus exact synthesis, reset and three-tab keyboard navigation.
 - Full previous math and UI suites also pass with no jsdom script errors. Convolution is unchanged. Native MathML is used for worked formulas and SVG for all graphs.
 - DOM tests do not validate mobile touch or browser-specific assistive-technology behavior.
+
+- Public Chrome check: three tabs visible; the removed pair is absent; the default T=2 example displays inner product 1.6 and coefficient 0.8; selecting pulse k=2 produces coefficient 0 and undefined phase. Display inspection identified and removed nested MathML scrollbar artifacts.
