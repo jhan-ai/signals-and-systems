@@ -55,3 +55,16 @@
 - The full existing math and DOM suites pass. All graph paths remain finite and no script errors are reported by jsdom.
 - Pulse series defaults to the lecture example A=2, T=4 s, w=2 s. Changing T preserves w/T. Turning DC off subtracts the same mean from the target and partial sum. Zero coefficients have no phase marker.
 - New calculations use closed-form continuous-time coefficients and integrals; SVG curves are sampled only for display. Touch behavior and browser-specific assistive-technology behavior require separate device testing.
+
+
+## 2026-10-07: Lecture-aligned replacement
+
+This revision supersedes the earlier Fourier interactive design described above.
+
+- Removed the conjugate-pair tab, both area-based detector modes, partial-integration animation and explanatory material about Gibbs or jump-limit convergence. Three main tabs remain.
+- Detector follows slides 145–148: conjugate multiplication, inner products over a full period, 0 for k≠m, XₘT for k=m, then division by T. The worked proof keeps exponential notation. The slide-148 schematic receives explicitly stated example coefficients and a non-unit period; real and imaginary parts are labeled separately.
+- Series follows example 5-5 (slide 152), example 5-3 (slide 150), and analysis/synthesis (slides 153–154). Pulse k=0 is integrated separately; the exponential antiderivative and sinc coefficient are displayed before the spectrum and synthesis. The example-5-3 coefficients remain given data, not described as measured quantities.
+- `fourier-advanced.test.cjs`: 582 checks against independent quadrature for basis and weighted inner products at T=1,2,4; pulse coefficients across periods and widths; and the exact trigonometric signals on slides 150/154.
+- `fourier-advanced-ui.test.cjs`: 58 checks for deletion, lecture-only explanations, 0/T cases, normalization, absent and negative coefficients, DC, source linkage, example switching, spectrum phase, partial versus exact synthesis, reset and three-tab keyboard navigation.
+- Full previous math and UI suites also pass with no jsdom script errors. Convolution is unchanged. Native MathML is used for worked formulas and SVG for all graphs.
+- DOM tests do not validate mobile touch or browser-specific assistive-technology behavior.

@@ -1,162 +1,170 @@
 'use strict';
-window.FourierAdvanced=(()=>{
-  const F=window.FourierAdvancedMath, cyan='#007f9f',orange='#c65327',ink='#45505b';
-  const pulse={A:2,T:4,D:.5,dc:true};
-  const pairState={A:2,phase:3,k:1,t:0};
-  const extract={mode:'complex',source:'lecture',m:1,p:1};
-  let timer=null;
-  const complex=z=>`${fmt(z.re,3)} ${z.im<0?'−':'+'} j${fmt(Math.abs(z.im),3)}`;
-  const phase=z=>Math.hypot(z.re,z.im)<1e-9?'정의 안 됨':pi(M.principalPhase(z.re,z.im))+' rad';
-  const sourceTerms=()=>extract.source==='lecture'?F.lecture():F.coefficients(state.parts,state.dc);
-  const lineAt=(a,t)=>a.layer.append(el('line',{x1:a.X(t),x2:a.X(t),y1:a.top,y2:a.h-a.bottom,stroke:'#b93233','stroke-width':1.3,'stroke-dasharray':'4 4'}));
-  const dot=(a,x,y,color)=>a.layer.append(el('circle',{cx:a.X(x),cy:a.Y(y),r:4,fill:color,stroke:'#fffddf','stroke-width':1.5}));
-  function stop(){
-    if(timer!==null)clearInterval(timer);timer=null;
-    for(const [id,label] of [['pair-play','회전 재생'],['extract-play','적분 다시 보기']]){$(id).textContent=label;$(id).setAttribute('aria-pressed','false');}
+window.FourierLesson=(()=>{
+ const F=window.FourierLessonMath,cyan='#007f9f',orange='#c65327',ink='#45505b',red='#b93233';
+ const detectState={source:'three',T:2,m:2,inspectK:1};
+ const seriesState={example:'pulse',A:2,T:4,D:.5,k:1,N:5};
+ // Native MathML keeps the displayed derivations aligned with the lecture notation.
+ const mi=s=>`<mi>${s}</mi>`,mo=s=>`<mo>${s}</mo>`,mn=s=>`<mn>${typeof s==='number'?fmt(s,4):s}</mn>`,row=s=>`<mrow>${s}</mrow>`;
+ const sub=(s,k)=>`<msub>${mi(s)}${typeof k==='number'?mn(k):mi(k)}</msub>`,sup=(a,b)=>`<msup>${a}${row(b)}</msup>`,frac=(a,b)=>`<mfrac>${row(a)}${row(b)}</mfrac>`;
+ const math=s=>`<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">${row(s)}</math>`;
+ const f0=sub('f',0),X=k=>sub('X',k),j=mi('j'),t=mi('t'),T=mi('T'),dt=mi('d')+t,eq=mo('='),times=mo('·');
+ const exp=a=>sup(mi('e'),a),wrap=a=>mo('(')+a+mo(')');
+ const exponent=k=>k===0?mn(1):exp(j+mn(2)+mi('π')+(k===1?'':k<0?wrap(mn(k)):mn(k))+f0+t);
+ const basis=k=>exp(j+mn(2)+mi('π')+(typeof k==='number'?(k<0?wrap(mn(k)):mn(k)):mi(k))+f0+t);
+ const integral=(lo,hi,body)=>`<msubsup>${mo('∫')}${row(lo)}${row(hi)}</msubsup>`+body+dt;
+ const sigma=(lo,hi,body)=>`<munderover>${mo('∑')}${row(lo)}${row(hi)}</munderover>`+body;
+ const scalar=z=>Math.abs(z.im)<1e-9?fmt(z.re,3):`${fmt(z.re,3)} ${z.im<0?'−':'+'} j${fmt(Math.abs(z.im),3)}`;
+ const zMath=z=>Math.abs(z.im)<1e-9?mn(z.re):(Math.abs(Math.hypot(z.re,z.im)-1)<1e-9?'':mn(Math.hypot(z.re,z.im)))+exp(j+`<mtext>${pi(M.principalPhase(z.re,z.im))}</mtext>`);
+ const phase=z=>Math.hypot(z.re,z.im)<1e-9?'정의 안 됨':pi(M.principalPhase(z.re,z.im))+' rad';
+ const divT=frac(mn(1),T),generalCoefficient=divT+integral(mn(0),T,mi('x')+wrap(t)+exp(mo('−')+j+mn(2)+mi('π')+mi('k')+f0+t));
+ const generalSeries=sigma(mi('k')+eq+mo('−')+mi('∞'),mi('∞'),X('k')+basis('k'));
+ function currentSource(){return detectState.source==='three'?F.three():detectState.source==='lecture'?F.lecture():F.coefficients(state.parts,state.dc);}
+ function detectT(){return detectState.source==='synth'?1:detectState.T;}
+ function sourceEquation(terms){return math(mi('x')+wrap(t)+eq+(terms.length?terms.map(z=>zMath(z)+(z.k===0?'':exponent(z.k))).join(mo('+')):mn(0)));}
+ function renderProof(){
+  const k=detectState.inspectK,m=detectState.m,q=k-m,period=detectT(),z=F.coefficient(currentSource(),k);
+  $('orthogonality-title').textContent=`k = ${k}, m = ${m}의 내적 계산 · 145–146쪽`;
+  const left=mo('⟨')+basis(k)+mo(',')+basis(m)+mo('⟩'),power=j+mn(2)+mi('π')+wrap(mn(k)+mo('−')+mn(m))+frac(t,T);
+  let lines=[math(left+eq+integral(mn(0),T,exp(power)))];
+  if(q===0){
+   lines.push(math(eq+integral(mn(0),T,mn(1))+eq+T+eq+mn(period)));
+   lines.push(`<p>k=m이므로 지수가 0이 됩니다. 같은 기저끼리의 내적은 T입니다.</p>`);
+  }else{
+   const primitive=frac(T+exp(j+mn(2)+mi('π')+wrap(mn(q))+frac(t,T)),j+mn(2)+mi('π')+wrap(mn(q)));
+   lines.push(math(eq+`<msubsup>${row(mo('[')+primitive+mo(']'))}${mn(0)}${T}</msubsup>`));
+   lines.push(math(eq+frac(T,j+mn(2)+mi('π')+wrap(mn(q)))+wrap(exp(j+mn(2)+mi('π')+wrap(mn(q)))+mo('−')+mn(1))+eq+mn(0)));
+   lines.push(`<p>k−m=${q}는 0이 아닌 정수이므로 e<sup>j2π(${q})</sup>=1입니다. 따라서 한 주기에서 서로 직교합니다.</p>`);
   }
-  function animate(kind){
-    const button=$(kind+'-play'),already=button.getAttribute('aria-pressed')==='true';stop();if(already)return;
-    if(kind==='extract')extract.p=0;
-    button.textContent='일시정지';button.setAttribute('aria-pressed','true');
-    timer=setInterval(()=>{
-      if(kind==='pair'){pairState.t=+(pairState.t+.005).toFixed(3);if(pairState.t>1)pairState.t=0;$('pair-time').value=pairState.t;renderPair();}
-      else{extract.p=Math.min(1,+(extract.p+.01).toFixed(2));$('extract-progress').value=extract.p;renderExtract();if(extract.p===1)stop();}
-    },60);
+  const weighted=F.scale(z,F.basisInner(k,m,period));
+  lines.push(`<p class="proof-result">원래 성분의 계수 X<sub>${k}</sub>까지 곱한 결과: <strong>${scalar(weighted)}</strong>${q===0?' (= X'+k+'T)':''}</p>`);
+  $('orthogonality-calculation').innerHTML=lines.join('');
+  document.querySelectorAll('[data-inspect-k]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.inspectK===k));
+ }
+ function detect(){
+  const terms=currentSource(),{source,m}=detectState,period=detectT(),z=F.coefficient(terms,m),raw=F.inner(terms,m,period);
+  $('detect-period').disabled=source==='synth';$('detect-period').value=period;$('detect-period-value').textContent=fmt(period)+' s';
+  $('detect-period-note').textContent=source==='synth'?'01의 모든 성분은 정수 Hz입니다. 공통 주기 T=1 s를 내적 구간으로 사용합니다.':`구간 [0, ${fmt(period)}] · f₀ = 1/T = ${fmt(1/period,3)} Hz`;
+  $('detect-example-note').textContent=source==='three'?'148쪽의 세 성분 X₁, X₂, X₃에 각각 1, 0.8, 0.5를 넣은 예시입니다.':source==='lecture'?'154쪽의 신호에 T를 지정하여 같은 방식으로 내적합니다.':'01에서 조절한 신호의 계수를 내적으로 구합니다.';
+  $('edit-detect-source').hidden=source!=='synth';$('detect-m-value').textContent=`m = ${m} · ${fmt(m/period,3)} Hz`;
+  $('detect-basis').innerHTML=math(basis(m));$('detect-conjugate').innerHTML=math(basis(-m));
+  document.querySelectorAll('[data-m]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.m===m));
+  $('detect-equation').innerHTML=sourceEquation(terms);
+  const bound=Math.max(1,terms.reduce((s,z)=>s+Math.hypot(z.re,z.im),0)*1.15),complex=source==='three';
+  const a=chart('detect-signal',{xmax:period,xticks:[0,period/2,period],ymin:-bound,ymax:bound,yticks:[-bound,0,bound],title:complex?'세 복소지수 성분의 합: 실수부와 허수부를 각각 표시':'분석할 실수 주기 신호의 한 주기'});
+  a.path(t=>F.signal(terms,t,period).re,complex?cyan:ink,2.4);
+  if(complex)a.path(t=>F.signal(terms,t,period).im,orange,2,{dash:'5 4'});
+  $('detect-signal-legend').innerHTML=complex?'<span class="plus-color">실선 · Re x(t)</span><span class="minus-color">점선 · Im x(t)</span>':'<span>x(t)</span>';
+  $('detect-signal-note').textContent=complex?'이 예시는 복소 신호이므로 Re x(t), Im x(t)를 따로 그렸습니다. 아래 내적은 복소지수식 그대로 계산합니다.':'아래 표에서는 실수 신호를 구성하는 양·음의 주파수 계수를 모두 표시합니다.';
+  $('detect-rule').innerHTML=math(integral(mn(0),T,exp(j+mn(2)+mi('π')+wrap(mi('k')+mo('−')+mi('m'))+f0+t))+eq+mo('{')+`<mtable columnalign="left"><mtr><mtd>${T}</mtd><mtd>${mi('k')+eq+mi('m')}</mtd></mtr><mtr><mtd>${mn(0)}</mtd><mtd>${mi('k')+mo('≠')+mi('m')}</mtd></mtr></mtable>`);
+  const rows=terms.some(v=>v.k===m)?terms:[...terms,{k:m,re:0,im:0}].sort((a,b)=>a.k-b.k);
+  $('detect-rows').innerHTML=rows.map(c=>{const match=c.k===m,q=c.k-m,output=F.scale(c,F.basisInner(c.k,m,period));return `<tr class="${match?'matching-row':''}"><th scope="row"><button data-inspect-k="${c.k}" class="coefficient-button" aria-label="k=${c.k}의 내적 계산 보기" aria-pressed="${c.k===detectState.inspectK}">k=${c.k}</button><small>${fmt(c.k/period,3)} Hz</small></th><td>${math(X(c.k)+(c.k===0?times+mn(1):exponent(c.k)))}<small>X<sub>${c.k}</sub> = ${scalar(c)}</small></td><td>${math(X(c.k)+(q===0?times+mn(1):exponent(q)))}<small>${match?'k=m':'k≠m'}</small></td><td>${math(match?X(c.k)+T+eq+zMath(output):mn(0))}<small>${match?'같은 주파수':'직교 → 0'}</small></td></tr>`;}).join('');
+  if(!rows.some(v=>v.k===detectState.inspectK))detectState.inspectK=rows[0]?.k??m;
+  renderProof();
+  const innerLeft=mo('⟨')+mi('x')+wrap(t)+mo(',')+basis(m)+mo('⟩');
+  $('detect-sum').innerHTML=math(innerLeft+eq+rows.map(c=>c.k===m?X(m)+T:mn(0)).join(mo('+'))+eq+X(m)+T);
+  $('detect-normalize').innerHTML=math(X(m)+eq+frac(X(m)+T,T)+eq+frac(zMath(raw),mn(period))+eq+zMath(z));
+  $('detect-inner-value').textContent=scalar(raw);$('detect-coefficient-value').textContent=scalar(z);$('detect-polar').textContent=`${fmt(Math.hypot(z.re,z.im),3)} · ${phase(z)}`;
+  $('detect-conclusion').textContent=Math.hypot(z.re,z.im)<1e-9?`X${m}=0이므로 ${fmt(m/period,3)} Hz 성분은 없습니다. 다른 주파수의 성분들은 이 기저와 직교합니다.`:`다른 주파수의 성분들은 내적이 0이 되고, k=${m} 성분에서 X${m}T만 남습니다. T=${fmt(period)}로 나누면 X${m}=${scalar(z)}입니다.`;
+ }
+ function seriesTerms(){return seriesState.example==='coefficients'?F.example53():F.lecture();}
+ function pulseSettings(){return {A:seriesState.A,T:seriesState.T,w:seriesState.D*seriesState.T};}
+ function seriesCoefficient(k){const p=pulseSettings();return seriesState.example==='pulse'?{k,re:F.pulseCoefficient(p.A,p.T,p.w,k),im:0}:F.coefficient(seriesTerms(),k);}
+ function plotPulseStep(a,A,T,w){
+  const lo=-T,hi=T,edges=[];for(let n=-2;n<=2;n++)for(const sign of [-1,1]){const p=n*T+sign*w/2;if(p>lo&&p<hi)edges.push(p);}
+  const points=[lo,...new Set(edges.sort((x,y)=>x-y)),hi];let d='';for(let i=0;i<points.length-1;i++){const x1=points[i],x2=points[i+1],y=F.pulseTarget(A,T,w,(x1+x2)/2);d+=`${i?'L':'M'}${a.X(x1)},${a.Y(y)}L${a.X(x2)},${a.Y(y)}`;}
+  a.layer.append(el('path',{d,fill:'none',stroke:'#8b9699','stroke-width':1.9,'stroke-dasharray':'6 5'}));
+ }
+ function renderSpectra(){
+  const {k,N,example}=seriesState,K=Math.max(5,Math.abs(k),N),data=Array.from({length:2*K+1},(_,i)=>seriesCoefficient(i-K));
+  const max=Math.max(.2,...data.map(z=>Math.hypot(z.re,z.im))),ticks=K<=5?[-5,-3,-1,0,1,3,5]:[-K,-Math.round(K/2),0,Math.round(K/2),K];
+  for(const [id,phasePlot] of [['series-amplitude',false],['series-phase',true]]){
+   const a=chart(id,{xmin:-K-1,xmax:K+1,xticks:ticks,ymin:phasePlot?-Math.PI*1.3:-.06*max,ymax:phasePlot?Math.PI*1.3:max*1.35,yticks:phasePlot?[-Math.PI,0,Math.PI]:[0,max/2,max],tickY:phasePlot?pi:fmt,xlabel:'k (f = kf₀)',title:phasePlot?'푸리에 계수의 위상 스펙트럼':'푸리에 계수의 크기 스펙트럼'});
+   a.layer.append(el('rect',{x:a.X(k)-8,y:a.top,width:16,height:a.h-a.bottom-a.top,fill:'#f6ded7'}));
+   data.forEach(z=>{const amplitude=Math.hypot(z.re,z.im);if(phasePlot&&amplitude<1e-9)return;const y=phasePlot?M.principalPhase(z.re,z.im):amplitude;const color=z.k===k?red:Math.abs(z.k)<=N?cyan:'#bfc5b6';a.stem(z.k,y,color,z.k===k?(phasePlot?pi(y):fmt(y,3)):undefined);});
   }
-  function renderPair(){
-    const {A,phase:p,k,t}=pairState,phi=M.phase(p),z=F.pair(A,phi,k,t),b=Math.max(1.5,A*1.15);
-    $('pair-a-value').textContent=fmt(A);$('pair-phase-value').textContent=pi(phi)+' rad';$('pair-k-value').textContent=k;$('pair-time-value').textContent=fmt(t,3);
-    const svg=el('svg',{viewBox:'0 0 340 340',role:'img','aria-label':`복소평면: z₊=${complex(z.plus)}, z₋=${complex(z.minus)}, 합=${fmt(z.total.re,3)}. 허수부는 0.`});
-    const X=x=>170+125*x/b,Y=y=>170-125*y/b;
-    svg.append(el('title',{},'반대 방향으로 회전하는 complex conjugate 쌍'));
-    for(const n of [-1,0,1]){svg.append(el('line',{x1:X(-b),x2:X(b),y1:Y(n*b),y2:Y(n*b),stroke:n===0?'#a4a999':'#e1dfc8'}));svg.append(el('line',{x1:X(n*b),x2:X(n*b),y1:Y(-b),y2:Y(b),stroke:n===0?'#a4a999':'#e1dfc8'}));}
-    svg.append(el('circle',{cx:170,cy:170,r:125*(A/2)/b,fill:'none',stroke:'#bdc6bb','stroke-dasharray':'4 4'}));
-    svg.append(el('text',{x:316,y:185},'Re'));svg.append(el('text',{x:180,y:30},'Im'));
-    for(const n of [-1,1]){svg.append(el('text',{x:X(n*A/2),y:190,'text-anchor':'middle'},fmt(n*A/2)));svg.append(el('text',{x:163,y:Y(n*A/2)-5,'text-anchor':'end'},fmt(n*A/2)));}
-    function arrow(v,color,width){
-      const x=X(v.re),y=Y(v.im),angle=Math.atan2(y-170,x-170);
-      svg.append(el('line',{x1:170,y1:170,x2:x,y2:y,stroke:color,'stroke-width':width,'stroke-linecap':'round'}));
-      if(Math.hypot(v.re,v.im)>1e-9)svg.append(el('path',{d:`M${x-9*Math.cos(angle-.45)},${y-9*Math.sin(angle-.45)} L${x},${y} L${x-9*Math.cos(angle+.45)},${y-9*Math.sin(angle+.45)}`,fill:'none',stroke:color,'stroke-width':width}));
-    }
-    for(const v of [z.plus,z.minus])svg.append(el('line',{x1:X(v.re),x2:X(v.re),y1:Y(v.im),y2:170,stroke:'#acb5a8','stroke-dasharray':'3 4'}));
-    arrow(z.total,ink,5);arrow(z.plus,cyan,2.5);arrow(z.minus,orange,2.5);$('pair-plane').replaceChildren(svg);
-    const a=chart('pair-wave',{xmax:1,xticks:[0,.25,.5,.75,1],ymin:-b,ymax:b,yticks:[-A,0,A].filter((v,i,a)=>a.indexOf(v)===i),ylabel:'Re',title:'각 복소지수의 실수부 A/2 cos와 합 A cos의 시간 파형'});
-    a.path(x=>F.pair(A,phi,k,x).plus.re,cyan,3,{dash:'7 5'});a.path(x=>F.pair(A,phi,k,x).minus.re,orange,1.5,{dash:'2 5'});a.path(x=>F.pair(A,phi,k,x).total.re,ink,2.5);lineAt(a,t);dot(a,t,z.total.re,ink);
-    $('pair-value').textContent=`Re 합 = ${fmt(z.total.re,3)} · Im 합 = 0`;
-    for(const [id,bilateral] of [['pair-bilateral',true],['pair-unilateral',false]]){
-      const g=chart(id,{xmin:bilateral?-5.7:-.5,xmax:5.7,xticks:bilateral?[-5,-k,0,k,5].filter((v,i,a)=>a.indexOf(v)===i):[0,k,5].filter((v,i,a)=>a.indexOf(v)===i),ymin:-.08,ymax:3.5,yticks:[0,1,2,3],xlabel:'f (Hz)',ylabel:bilateral?'|Xₙ|':'A',title:bilateral?'양측 복소 계수: 음과 양의 주파수에 A/2씩':'단측 cos 진폭: 양의 주파수에 A'});
-      if(A>1e-9){if(bilateral)g.stem(-k,A/2,orange,fmt(A/2));g.stem(k,bilateral?A/2:A,cyan,fmt(bilateral?A/2:A));}
-    }
-    $('pair-bilateral-note').textContent=A===0?'모든 계수가 0입니다. 위상은 정의하지 않습니다.':`X₊ₖ: 크기 ${fmt(A/2)}, 위상 ${pi(phi)} · X₋ₖ: 크기 ${fmt(A/2)}, 위상 ${pi(M.principalPhase(Math.cos(phi),-Math.sin(phi)))}`;
-    $('pair-unilateral-note').textContent=A===0?'신호가 0입니다.':`${fmt(A)} cos(2π · ${k}t ${phi<0?'−':'+'} ${pi(Math.abs(phi))})`;
+  const period=example==='pulse'?seriesState.T:1;
+  $('series-spectrum-note').textContent=`실제 주파수는 kf₀ = k × ${fmt(1/period,3)} Hz입니다. 붉은 표시: 선택한 k=${k}. 진한 막대: |k|≤${N}의 합성 성분. 크기가 0인 계수의 위상은 정의하지 않습니다.`;
+ }
+ function pulseDerivation(){
+  const {A,T:period,w}=pulseSettings(),k=seriesState.k;
+  const minusHalf=mo('−')+frac(mi('w'),mn(2)),plusHalf=frac(mi('w'),mn(2)),power=exp(mo('−')+j+mn(2)+mi('π')+mi('k')+frac(t,T));
+  const common=math(X('k')+eq+divT+integral(mo('−')+frac(T,mn(2)),frac(T,mn(2)),mi('x')+wrap(t)+power)+eq+frac(mi('A'),T)+integral(minusHalf,plusHalf,power));
+  const lines=[common];
+  if(k===0){lines.push(math(X(0)+eq+frac(mi('A'),T)+integral(minusHalf,plusHalf,mn(1))+eq+frac(mi('A')+mi('w'),T)+eq+mn(A*w/period)));lines.push('<p>k=0에서는 지수항이 1입니다. X₀는 한 주기의 평균값, 즉 DC 성분입니다.</p>');}
+  else{
+   const primitive=frac(power,mo('−')+j+mn(2)+mi('π')+frac(mi('k'),T));
+   lines.push(math(X('k')+eq+frac(mi('A'),T)+`<msubsup>${row(mo('[')+primitive+mo(']'))}${row(minusHalf)}${row(plusHalf)}</msubsup>`+eq+frac(mi('A'),mi('π')+mi('k'))+mi('sin')+wrap(frac(mi('π')+mi('k')+mi('w'),T))));
+   lines.push(math(X(k)+eq+frac(mn(A),mi('π')+wrap(mn(k)))+mi('sin')+wrap(frac(mi('π')+wrap(mn(k))+times+mn(w),mn(period)))+eq+mn(F.pulseCoefficient(A,period,w,k))));
   }
-  function renderExtract(){
-    const terms=sourceTerms(),{m,p}=extract,signal=t=>F.product(terms,0,t).re,product=t=>F.product(terms,m,t);
-    const b=Math.max(1,terms.reduce((s,z)=>s+Math.hypot(z.re,z.im),0)*1.1),current=F.integral(terms,m,p),final=F.integral(terms,m,1);
-    $('extract-m-value').textContent=`m = ${m}`;$('extract-progress-value').textContent=`${Math.round(p*100)}%`;
-    $('extract-equation').innerHTML=extract.source==='lecture'?'x(t) = 1 + 2 cos(2πt + π/4)<br>+ cos(6πt − π/3)':signalEquation();
-    $('extract-edit').hidden=extract.source!=='synth';
-    document.querySelectorAll('[data-m]').forEach(button=>button.setAttribute('aria-pressed',+button.dataset.m===m));
-    const options={xmax:1,xticks:[0,.25,.5,.75,1],ymin:-b,ymax:b,yticks:[-b,0,b]};
-    const src=chart('extract-signal',{...options,ylabel:'x(t)',title:'분석할 신호의 한 주기'});src.path(signal);lineAt(src,p);
-    for(const [id,key,color] of [['extract-real','re',cyan],['extract-imag','im',orange]]){
-      const a=chart(id,{...options,title:`기준 복소지수를 곱한 결과의 ${key==='re'?'실수부':'허수부'}와 현재까지의 부호 있는 면적`});
-      a.area(t=>t<=p?product(t)[key]:0);a.path(t=>product(t)[key],color,2);lineAt(a,p);
-    }
-    let ib=.2;for(let j=0;j<=200;j++){const z=F.integral(terms,m,j/200);ib=Math.max(ib,Math.abs(z.re)*1.25,Math.abs(z.im)*1.25);}
-    const a=chart('extract-integral',{...options,ymin:-ib,ymax:ib,yticks:[-ib,0,ib],xlabel:'τ/T',title:'누적 적분의 실수부와 허수부. 한 주기가 끝나면 선택한 복소 계수가 됩니다.'});
-    a.path(t=>F.integral(terms,m,t).re,cyan,2);a.path(t=>F.integral(terms,m,t).im,orange,2,{dash:'5 4'});lineAt(a,p);dot(a,p,current.re,cyan);dot(a,p,current.im,orange);
-    $('extract-current').textContent=complex(current);$('extract-final').textContent=complex(final);$('extract-polar').textContent=`${fmt(Math.hypot(final.re,final.im),3)} · ${phase(final)}`;
-    $('extract-terms').replaceChildren(...terms.map(z=>{
-      const row=document.createElement('tr');if(z.k===m)row.className='selected';
-      for(const value of [z.k,complex(z),z.k-m,complex(F.contribution(z,m,p))]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}return row;
-    }));
-    $('extract-conclusion').textContent=p<1?`현재 ${Math.round(p*100)}% 적분했습니다. 아직 X${m}으로 확정할 수 없습니다.`:m===0?`m = 0: 평균값 X₀ = ${fmt(final.re,3)}이 남습니다.`:Math.hypot(final.re,final.im)<1e-9?`m = ${m}: 한 주기에서 모든 기여분이 상쇄되어 Xₘ = 0입니다.`:`m = ${m}: 같은 차수의 성분만 남아 Xₘ = ${complex(final)}입니다.`;
-  }
-  function detect(){
-    const advanced=extract.mode==='complex';$('detect-complex').hidden=!advanced;$('detect-real').hidden=advanced;
-    $('mode-complex').setAttribute('aria-pressed',advanced);$('mode-real').setAttribute('aria-pressed',!advanced);
-    if(advanced)renderExtract();return advanced;
-  }
-  function resetPulse(){Object.assign(pulse,{A:2,T:4,D:.5,dc:true});syncPulse();}
-  function syncPulse(){
-    $('pulse-a').value=pulse.A;$('pulse-period').value=pulse.T;
-    $('pulse-width').min=pulse.T*.05;$('pulse-width').max=pulse.T;$('pulse-width').step=pulse.T*.01;$('pulse-width').value=pulse.D*pulse.T;$('pulse-dc').checked=pulse.dc;
-  }
-  function renderPulse(){
-    const {A,T,D,dc}=pulse,N=state.n,mean=A*D,offset=dc?0:mean;
-    syncPulse();$('pulse-a-value').textContent=fmt(A);$('pulse-period-value').textContent=fmt(T)+' s';$('pulse-width-value').textContent=fmt(D*T,3)+' s';$('pulse-duty').textContent=`w/T = ${fmt(D)} · f₀ = ${fmt(1/T,3)} Hz`;
-    $('harmonics-value').textContent='N = '+N;document.querySelectorAll('[data-n]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.n===N));
-    let count=0;for(let k=1;k<=N;k++)if(Math.abs(F.pulseCoefficient(A,D,k))>1e-9)count++;
-    $('term-count').innerHTML=count+'<span>개</span>';$('harmonic-note').textContent=`양의 차수 ${count}개 + DC ${dc?fmt(mean):'제외'}. 양측 계수 쌍을 실수 cos로 더합니다.`;
-    $('series-task-title').textContent='펄스 폭을 절반으로 줄이면?';$('series-task').textContent='w/T가 작아지면 DC는 줄고, sinc의 첫 영점은 더 높은 차수로 이동합니다.';
-    const ymin=-Math.max(.3,A*.3)-offset,ymax=Math.max(1,A*1.35)-offset;
-    const a=chart('series-plot',{xmin:-T,xmax:T,xticks:[-T,-T/2,0,T/2,T],ymin,ymax,yticks:[-offset,A/2-offset,A-offset].filter((v,i,a)=>a.indexOf(v)===i),ylabel:dc?'x(t)':'x(t) − X₀',title:`주기 ${T}초, 폭 ${fmt(T*D,3)}초, 높이 ${A}의 펄스와 ${N}차 부분합`});
-    a.svg.setAttribute('role','group');
-    // Exact step path keeps the discontinuities vertical at every viewport width.
-    const edges=[];for(let j=-2;j<=2;j++)for(const sign of [-1,1]){const x=(j+sign*D/2)*T;if(x>-T&&x<T)edges.push(x);}edges.sort((x,y)=>x-y);
-    const points=[-T,...new Set(edges),T];let d='';
-    for(let i=0;i<points.length-1;i++){const x1=points[i],x2=points[i+1],y=F.pulseTarget(A,T,D,(x1+x2)/2,dc);d+=`${i?'L':'M'}${a.X(x1)},${a.Y(y)}L${a.X(x2)},${a.Y(y)}`;}
-    a.layer.append(el('path',{d,fill:'none',stroke:'#8fa2b1','stroke-width':1.7,'stroke-dasharray':'6 5'}));
-    a.path(t=>F.pulseSum(A,T,D,N,t,dc),ink,2.5,{samples:2400});
-    for(const sign of [-1,1]){
-      const x=sign*D*T/2,y=A/2-offset,handle=el('g',{class:'pulse-handle',tabindex:'0',role:'slider','aria-label':`${sign<0?'왼쪽':'오른쪽'} 펄스 경계 · 폭 조절`,'aria-valuemin':.05*T,'aria-valuemax':T,'aria-valuenow':+(D*T).toFixed(3),'aria-valuetext':`폭 ${fmt(D*T,3)}초`,'data-pulse-edge':sign});
-      handle.append(el('line',{x1:a.X(x),x2:a.X(x),y1:a.top,y2:a.h-a.bottom,class:'pulse-guide'}));
-      handle.append(el('rect',{x:a.X(x)-18,y:a.Y(y)-22,width:36,height:44,fill:'transparent'}));
-      handle.append(el('circle',{cx:a.X(x),cy:a.Y(y),r:9,class:'handle-knob'}));handle.append(el('text',{x:a.X(x),y:a.Y(y)+4,'text-anchor':'middle',style:'fill:#007f9f;pointer-events:none'},'↔'));a.svg.append(handle);
-    }
-    $('series-equation').innerHTML=`D = w/T = ${fmt(D)} &nbsp; Xₖ = AD sinc(kD) &nbsp; X₀ = ${fmt(mean,3)}<br>x<sub>N</sub>(t) = ${dc?'X₀':'0'} + 2 ∑<sub>k=1</sub><sup>N</sup> Xₖ cos(2πkt/T)<br><span class="hint">sinc(v) = sin(πv)/(πv), sinc(0) = 1</span>`;
-    $('series-spectrum-title').textContent='양측 복소 계수의 크기';$('series-spectrum-badge').textContent='|Xₖ|';
-    const K=Math.max(10,N),ticks=K<=15?[-K,-5,0,5,K]:[-K,-Math.round(K/2),0,Math.round(K/2),K];
-    const h=chart('harmonic-spectrum',{xmin:-K-1,xmax:K+1,xticks:ticks,ymin:-.03,ymax:Math.max(.3,mean*1.25),yticks:mean>0?[0,mean/2,mean]:[0,.1,.2],xlabel:'harmonic 차수 k',title:'펄스의 양측 복소 계수 크기. 선택한 N 이내는 진하게, 그 밖은 연하게 표시합니다.'});
-    const ph=chart('pulse-phase',{xmin:-K-1,xmax:K+1,xticks:ticks,ymin:-.3,ymax:Math.PI*1.25,yticks:[0,Math.PI],tickY:pi,xlabel:'harmonic 차수 k',title:'펄스의 양측 복소 계수 위상. 0인 계수의 위상은 표시하지 않습니다.'});
-    for(let k=-K;k<=K;k++){
-      const v=k===0&&!dc?0:F.pulseCoefficient(A,D,k),active=Math.abs(k)<=N,color=active?cyan:'#bfc9b7';
-      h.stem(k,Math.abs(v),color,Math.abs(k)<=3&&Math.abs(v)>1e-9&&K<=10?fmt(Math.abs(v),3):undefined);
-      if(Math.abs(v)>1e-9)ph.stem(k,v<0?Math.PI:0,color);
-    }
-    $('series-spectrum-note').textContent=`진한 막대: |k| ≤ ${N}의 합성 성분 · 연한 막대: 그 밖의 계수. 실제 주파수는 k/${fmt(T)} Hz. ${dc?'0차 막대는 평균값입니다.':'DC를 제외하여 0차 막대가 0입니다.'}`;
-    $('series-conclusion').textContent=A===0?'A = 0: 신호와 모든 계수가 0입니다.':D===1?'w = T: 상수 신호가 되어 DC만 남습니다.':`평균값 X₀ = Aw/T = ${fmt(mean,3)} · sinc 포락선의 첫 양의 영점 k = T/w = ${fmt(1/D,3)}`;
-    $('series-detail').textContent=(dc?'':'DC를 끄면 목표와 부분합 모두에서 평균값을 뺍니다. ')+(D<1&&A>0?'영점이 정수 k와 일치할 때 해당 계수가 0입니다. N을 늘리면 펄스를 더 잘 재구성하지만 점프 근처에는 Gibbs 현상이 남습니다. 점프 지점은 양쪽 값의 평균으로 수렴합니다.':'N을 늘려도 파형이 변하지 않습니다.');
-    return a;
-  }
-  function series(){
-    const active=state.shape==='pulse';$('pulse-controls').hidden=!active;$('pulse-phase-card').hidden=!active;$('series-fundamental').hidden=active;$('series-plot').classList.toggle('pulse-draggable',active);
-    if(active){renderPulse();return true;}
-    $('series-spectrum-title').textContent='harmonics별 진폭';$('series-spectrum-badge').textContent='진폭';$('series-spectrum-note').textContent='가로축은 harmonic 차수 k입니다. 실제 주파수는 kf₀입니다.';$('series-task-title').textContent='차수를 5에서 6으로 바꾸면?';return false;
-  }
-  for(const [id,key] of [['pair-a','A'],['pair-phase','phase'],['pair-k','k'],['pair-time','t']])$(id).addEventListener('input',e=>{stop();pairState[key]=+e.target.value;renderPair();});
-  $('pair-play').addEventListener('click',()=>animate('pair'));
-  $('reset-pair').addEventListener('click',()=>{stop();Object.assign(pairState,{A:2,phase:3,k:1,t:0});for(const [id,key] of [['pair-a','A'],['pair-phase','phase'],['pair-k','k'],['pair-time','t']])$(id).value=pairState[key];renderPair();});
-  for(const mode of ['complex','real'])$('mode-'+mode).addEventListener('click',()=>{stop();stopScan();extract.mode=mode;render();});
-  $('extract-source').addEventListener('change',e=>{stop();extract.source=e.target.value;renderExtract();});
-  $('extract-edit').addEventListener('click',()=>setTab('synth',true));
-  for(const [id,key] of [['extract-m','m'],['extract-progress','p']])$(id).addEventListener('input',e=>{stop();extract[key]=+e.target.value;renderExtract();});
-  document.querySelectorAll('[data-m]').forEach(b=>b.addEventListener('click',()=>{stop();extract.m=+b.dataset.m;$('extract-m').value=extract.m;renderExtract();}));
-  $('extract-play').addEventListener('click',()=>animate('extract'));
-  $('reset-extract').addEventListener('click',()=>{stop();Object.assign(extract,{source:'lecture',m:1,p:1});$('extract-source').value='lecture';$('extract-m').value=1;$('extract-progress').value=1;renderExtract();});
-  $('pulse-a').addEventListener('input',e=>{pulse.A=+e.target.value;render();});
-  $('pulse-period').addEventListener('input',e=>{pulse.T=+e.target.value;render();});
-  $('pulse-width').addEventListener('input',e=>{pulse.D=+e.target.value/pulse.T;render();});
-  $('pulse-dc').addEventListener('change',e=>{pulse.dc=e.target.checked;render();});
-  $('pulse-example').addEventListener('click',()=>{resetPulse();state.n=5;$('harmonics').value=5;render();});
-  const host=$('series-plot');let dragging=false;
-  function drag(event){
-    const svg=host.querySelector('svg'),box=svg.getBoundingClientRect();if(!box.width)return;
-    const width=svg.viewBox?.baseVal?.width||Math.max(260,host.clientWidth||600),x=(event.clientX-box.left)*width/box.width;
-    const t=-pulse.T+(x-46)/(width-65)*2*pulse.T;
-    pulse.D=Math.max(.05,Math.min(1,Math.round(2*Math.abs(t)/pulse.T*100)/100));renderPulse();
-  }
-  host.addEventListener('pointerdown',e=>{if(state.shape!=='pulse'||!e.target.closest('[data-pulse-edge]'))return;e.preventDefault();dragging=true;host.classList.add('dragging');host.setPointerCapture?.(e.pointerId);drag(e);});
-  host.addEventListener('pointermove',e=>{if(dragging)drag(e);});
-  for(const event of ['pointerup','pointercancel','lostpointercapture'])host.addEventListener(event,()=>{dragging=false;host.classList.remove('dragging');});
-  host.addEventListener('keydown',e=>{
-    const handle=e.target.closest('[data-pulse-edge]');if(!handle||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;
-    e.preventDefault();const side=+handle.dataset.pulseEdge;
-    pulse.D=e.key==='Home'?.05:e.key==='End'?1:Math.max(.05,Math.min(1,+(pulse.D+(e.key==='ArrowUp'?.01:e.key==='ArrowDown'?-.01:(e.key==='ArrowRight'?1:-1)*side*.01)).toFixed(2)));
-    renderPulse();host.querySelector(`[data-pulse-edge="${side}"]`).focus();
-  });
-  window.addEventListener('pagehide',stop);
-  syncPulse();
-  return {pair:renderPair,detect,series,stop,resetPulse,snapshot:()=>({pulse:{...pulse,w:pulse.D*pulse.T},pair:{...pairState},extract:{...extract,current:F.integral(sourceTerms(),extract.m,extract.p),coefficient:F.integral(sourceTerms(),extract.m,1)}})};
+  lines.push(math(X('k')+eq+frac(mi('A')+mi('w'),T)+mi('sinc')+wrap(frac(mi('k')+mi('w'),T))));
+  lines.push('<p class="chart-note">sinc(v)=sin(πv)/(πv), sinc(0)=1. 예제 5-5에서는 A=2, T=4, w=2이므로 Xₖ=sinc(k/2)입니다.</p>');
+  return lines.join('');
+ }
+ function series(){
+  const {example,A,T:storedT,D,k,N}=seriesState,pulse=example==='pulse',given=example==='coefficients',period=pulse?storedT:1,w=D*storedT,terms=seriesTerms(),z=seriesCoefficient(k);
+  $('pulse-controls').hidden=!pulse;$('pulse-a').value=A;$('pulse-period').value=storedT;$('pulse-width').min=storedT*.05;$('pulse-width').max=storedT;$('pulse-width').step=storedT*.01;$('pulse-width').value=w;
+  $('pulse-a-value').textContent=fmt(A);$('pulse-period-value').textContent=fmt(storedT)+' s';$('pulse-width-value').textContent=fmt(w,3)+' s';$('pulse-period-note').textContent='중심은 t=0입니다. T를 바꾸면 폭의 비율 w/T를 유지합니다.';
+  $('series-k-value').textContent=`k = ${k}`;$('harmonics-value').textContent=`N = ${N}`;
+  document.querySelectorAll('[data-k]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.k===k));document.querySelectorAll('[data-n]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.n===N));
+  $('series-example-note').textContent=pulse?'152쪽의 예제 5-5에서 시작합니다. A, T, w를 바꾸며 같은 계수 계산식을 적용해 보세요.':given?'150쪽의 예제 5-3입니다. 주어진 Xₖ를 급수에 대입하고 삼각함수의 합으로 나타냅니다.':'154쪽의 신호입니다. 시간 영역의 신호와 진폭·위상 스펙트럼을 연결합니다.';
+  $('series-period').textContent=`T = ${fmt(period)} s · f₀ = ${fmt(1/period,3)} Hz`;
+  $('series-source-overline').textContent=given?'01 · GIVEN COEFFICIENTS':'01 · TIME DOMAIN';$('series-operation').textContent=given?'02 · SPECTRUM':'02 · ANALYSIS';
+  $('series-source-title').textContent=given?'주어진 푸리에 계수':'주기 신호 x(t)';$('series-source').hidden=given;
+  $('series-source-equation').innerHTML=pulse?(D===1?math(mi('x')+wrap(t)+eq+mn(A)):math(mi('x')+wrap(t)+eq+mo('{')+`<mtable columnalign="left"><mtr><mtd>${mn(A)}</mtd><mtd>${mo('|')+t+mo('|')+mo('<')+mn(w/2)}</mtd></mtr><mtr><mtd>${mn(0)}</mtd><mtd><mtext>나머지 구간</mtext></mtd></mtr></mtable>`)):given?terms.map(c=>math(X(c.k)+eq+zMath(c))).join(''):math(mi('x')+wrap(t)+eq+mn(1)+mo('+')+mn(2)+mi('cos')+wrap(mn(2)+mi('π')+t+mo('+')+frac(mi('π'),mn(4)))+mo('+')+mi('cos')+wrap(mn(6)+mi('π')+t+mo('−')+frac(mi('π'),mn(3))));
+  $('series-source-note').textContent=pulse?`한 주기 [−${fmt(period/2)}, ${fmt(period/2)}]에서 정의한 뒤 T=${fmt(period)} s마다 반복합니다. 펄스가 0이 아닌 구간 [−${fmt(w/2,3)}, ${fmt(w/2,3)}]에서 계수 적분을 계산합니다.`:given?'위에 주어지지 않은 Xₖ는 모두 0입니다. 아래에서 각 계수를 스펙트럼으로 읽고 신호를 합성합니다.':'주파수 분석은 이 신호를 구성하는 각 성분의 계수 Xₖ를 구하는 과정입니다.';
+  const bound=pulse?Math.max(1,A*1.35):terms.reduce((s,z)=>s+Math.hypot(z.re,z.im),0)*1.12;
+  const plotOptions={xmin:pulse?-period:0,xmax:pulse?period:2*period,xticks:pulse?[-period,-period/2,0,period/2,period]:[0,.5,1,1.5,2],ymin:pulse?-Math.max(.3,A*.3):-bound,ymax:bound,yticks:pulse?[0,A/2,A].filter((v,i,a)=>a.indexOf(v)===i):[-bound,0,bound]};
+  if(!given){const src=chart('series-source',{...plotOptions,title:'계수를 구할 원래 주기 신호'});if(pulse)plotPulseStep(src,A,period,w);else src.path(t=>F.signal(terms,t,period).re);}
+  $('series-slide').textContent=pulse?'152쪽':given?'150쪽':'154쪽';$('series-coefficient-title').textContent=given?'계수와 스펙트럼 읽기':'푸리에 계수 Xₖ 계산';
+  if(pulse)$('series-coefficient-formula').innerHTML=pulseDerivation();
+  else if(given)$('series-coefficient-formula').innerHTML=math(X(k)+eq+zMath(z))+`<p>예제에서 주어진 계수입니다. X<sub>${k}</sub>가 주파수 ${k} Hz 성분의 크기와 위상을 결정합니다.</p>`;
+  else $('series-coefficient-formula').innerHTML=math(X('k')+eq+generalCoefficient)+sourceEquation(terms)+math(X(k)+eq+frac(X(k)+T,T)+eq+zMath(z))+`<p>02의 직교성과 같은 원리입니다. k=${k} 이외의 성분은 내적이 0이 됩니다.</p>`;
+  $('series-coefficient-label').textContent=`선택한 계수 X${k}`;$('series-coefficient-value').textContent=scalar(z);$('series-magnitude').textContent=fmt(Math.hypot(z.re,z.im),3);$('series-phase-value').textContent=phase(z);
+  renderSpectra();
+  const finiteSum=sigma(mi('k')+eq+mo('−')+mi('N'),mi('N'),X('k')+basis('k'));
+  let synthesis=math(mi('x')+wrap(t)+eq+generalSeries)+math(sub('x','N')+wrap(t)+eq+finiteSum);
+  if(!pulse){
+   const dc=given?6:1,a1=given?4:2,a3=given?2:1;
+   synthesis+=math(sub('x','N')+wrap(t)+eq+mn(dc)+(N>=1?mo('+')+mn(a1)+mi('cos')+wrap(mn(2)+mi('π')+t+mo('+')+frac(mi('π'),mn(4))):'')+(N>=3?mo('+')+(a3===1?'':mn(a3))+mi('cos')+wrap(mn(6)+mi('π')+t+mo('−')+frac(mi('π'),mn(3))):''));
+  }else synthesis+=math(X('k')+eq+frac(mn(A)+times+mn(w),mn(period))+mi('sinc')+wrap(frac(mi('k')+times+mn(w),mn(period))));
+  $('series-synthesis-formula').innerHTML=synthesis;
+  const graph=chart('series-plot',{...plotOptions,title:`원래 신호와 −${N}차부터 ${N}차까지의 푸리에 부분합`});
+  if(pulse)plotPulseStep(graph,A,period,w);else graph.path(t=>F.signal(terms,t,period).re,'#8b9699',1.8,{dash:'6 5'});
+  graph.path(t=>pulse?F.pulseSum(A,period,w,N,t):F.signal(terms,t,period,N).re,ink,2.6,{samples:Math.max(800,N*60)});
+  $('series-conclusion').textContent=N===0?'N=0: X₀만 더했으므로 DC 성분만 남습니다.':!pulse&&N>=3?'0이 아닌 계수 X₀, X±₁, X±₃을 모두 포함했습니다. 이 예제에서는 합성한 신호가 원래 x(t)와 같습니다.':`−${N}≤k≤${N}의 항을 더했습니다. ${Math.abs(k)>N?`선택한 X${k}는 아직 이 합에 포함되지 않습니다.`:Math.hypot(z.re,z.im)<1e-9?`X${k}=0이므로 해당 항을 더해도 합은 변하지 않습니다.`:`선택한 X${k}도 이 합에 사용됩니다.`}`;
+ }
+ function resetDetect(){Object.assign(detectState,{source:'three',T:2,m:2,inspectK:1});$('detect-example').value='three';$('detect-period').value=2;$('detect-m').value=2;detect();}
+ function resetSeries(){Object.assign(seriesState,{example:'pulse',A:2,T:4,D:.5,k:1,N:5});$('series-example').value='pulse';$('series-k').value=1;$('harmonics').value=5;series();}
+ $('reset-detect').addEventListener('click',resetDetect);$('reset-series').addEventListener('click',resetSeries);
+ $('detect-example').addEventListener('change',e=>{detectState.source=e.target.value;detectState.T=e.target.value==='three'?2:1;detectState.inspectK=e.target.value==='three'?1:-1;detect();});
+ $('detect-period').addEventListener('input',e=>{detectState.T=+e.target.value;detect();});$('detect-m').addEventListener('input',e=>{detectState.m=+e.target.value;detect();});
+ document.querySelectorAll('[data-m]').forEach(b=>b.addEventListener('click',()=>{detectState.m=+b.dataset.m;$('detect-m').value=detectState.m;detect();}));
+ $('detect-rows').addEventListener('click',e=>{const b=e.target.closest('[data-inspect-k]');if(b){detectState.inspectK=+b.dataset.inspectK;renderProof();}});
+ $('edit-detect-source').addEventListener('click',()=>setTab('synth',true));
+ $('series-example').addEventListener('change',e=>{seriesState.example=e.target.value;seriesState.N=e.target.value==='pulse'?5:3;$('harmonics').value=seriesState.N;series();});
+ for(const [id,key] of [['pulse-a','A'],['pulse-period','T'],['series-k','k'],['harmonics','N']])$(id).addEventListener('input',e=>{seriesState[key]=+e.target.value;series();});
+ $('pulse-width').addEventListener('input',e=>{seriesState.D=+e.target.value/seriesState.T;series();});
+ $('pulse-example').addEventListener('click',()=>{seriesState.A=2;seriesState.T=4;seriesState.D=.5;series();});
+ for(const key of ['k','n'])document.querySelectorAll(`[data-${key}]`).forEach(b=>b.addEventListener('click',()=>{seriesState[key==='n'?'N':'k']=+b.dataset[key];$(key==='n'?'harmonics':'series-k').value=b.dataset[key];series();}));
+ const snapshot=()=>({experiment:state.tab,components:state.parts.map(p=>({...p})),dc:state.dc,detect:{...detectState,T:detectT(),inner:F.inner(currentSource(),detectState.m,detectT()),coefficient:F.coefficient(currentSource(),detectState.m)},series:{...seriesState,w:seriesState.D*seriesState.T,coefficient:seriesCoefficient(seriesState.k)}});
+ // Browser tooling controls the same fields as the visible UI; removed experiments are not registered.
+ if(document.modelContext?.registerTool){
+  const controller=new AbortController(),register=tool=>{try{Promise.resolve(document.modelContext.registerTool(tool,{signal:controller.signal})).catch(()=>{});}catch{}};
+  register({name:'read_fourier_experiment',title:'푸리에 실험 상태 읽기',description:'Read synthesis, inner-product and Fourier-series parameters and results.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:snapshot});
+  register({name:'configure_fourier_experiment',title:'푸리에 실험 조절',description:'Select a lecture-aligned experiment or change its coefficient index and series order. Does not persist data.',inputSchema:{type:'object',properties:{experiment:{type:'string',enum:['synth','detect','series']},detectExample:{type:'string',enum:['three','lecture','synth']},m:{type:'integer',minimum:-10,maximum:10},seriesExample:{type:'string',enum:['pulse','lecture','coefficients']},k:{type:'integer',minimum:-10,maximum:10},maxHarmonic:{type:'integer',minimum:0,maximum:49}},additionalProperties:false},annotations:{readOnlyHint:false},execute:input=>{
+   if(!input||typeof input!=='object'||Array.isArray(input))throw Error('Expected an object');
+   for(const key of Object.keys(input))if(!['experiment','detectExample','m','seriesExample','k','maxHarmonic'].includes(key))throw Error('Unknown property');
+   if(input.experiment!==undefined&&!['synth','detect','series'].includes(input.experiment))throw Error('Unknown experiment');
+   if(input.detectExample!==undefined&&!['three','lecture','synth'].includes(input.detectExample))throw Error('Unknown detector example');
+   if(input.seriesExample!==undefined&&!['pulse','lecture','coefficients'].includes(input.seriesExample))throw Error('Unknown series example');
+   for(const [key,min,max] of [['m',-10,10],['k',-10,10],['maxHarmonic',0,49]])if(input[key]!==undefined&&(!Number.isInteger(input[key])||input[key]<min||input[key]>max))throw Error('Invalid '+key);
+   if(input.detectExample!==undefined){detectState.source=input.detectExample;detectState.T=input.detectExample==='three'?2:1;$('detect-example').value=input.detectExample;}
+   if(input.m!==undefined){detectState.m=input.m;$('detect-m').value=input.m;}
+   if(input.seriesExample!==undefined){seriesState.example=input.seriesExample;$('series-example').value=input.seriesExample;}
+   if(input.k!==undefined){seriesState.k=input.k;$('series-k').value=input.k;}
+   if(input.maxHarmonic!==undefined){seriesState.N=input.maxHarmonic;$('harmonics').value=input.maxHarmonic;}
+   setTab(input.experiment||state.tab);return snapshot();
+  }});window.addEventListener('pagehide',()=>controller.abort(),{once:true});
+ }
+ return {detect,series,snapshot};
 })();
