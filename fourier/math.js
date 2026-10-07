@@ -36,5 +36,5 @@
     if(shape==='square')return Math.abs(Math.sin(TAU*u))<1e-10?0:(Math.sin(TAU*u)>0?1:-1);
     return Math.abs(u-Math.round(u))<1e-10?0:2*frac-1;
   }
-  root.FourierMath={TAU,initial,phase,sample,spectrum,analyze,harmonics,target};
+  root.FourierMath={TAU,initial,phase,principalPhase,sample,spectrum,analyze,harmonics,target};
 })(typeof window==='undefined'?globalThis:window);

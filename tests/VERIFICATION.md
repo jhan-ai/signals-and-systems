@@ -45,3 +45,13 @@
 - SVG paths remain finite. Fourier files are unchanged.
 - Local browser preview was blocked by the browser's network policy. DOM tests do not establish visual layout or touch behavior.
 - Arbitrary expressions use finite-interval quadrature. Step boundaries with affine arguments are split explicitly. Tail expansion and finer quadrature are diagnostics, not convergence proofs. Very high frequencies, non-affine narrow features, or singularities require care; this is not a symbolic integration engine.
+
+
+## 2026-10-07: Fourier-series interactive additions
+
+- Four main tabs: synthesis, complex-exponential pair, frequency detection, and Fourier series. Existing real cos/sin detection and square/triangle/sawtooth series remain available.
+- `fourier-advanced.test.cjs`: 1,625 assertions. Independent quadrature checks signed complex coefficients and partial integrals; pulse integrals verify sinc coefficients, DC, zeros and signs. Conjugate-pair checks verify cancellation of imaginary parts and the A/2-to-A relationship.
+- `fourier-advanced-ui.test.cjs`: coefficient choices including negative/zero/missing orders, partial/full integration, linked synthesis source, mode switching, stop-on-tab-change, pulse sliders/DC/keyboard and pointer controls, reset, existing waveforms and keyboard tab navigation.
+- The full existing math and DOM suites pass. All graph paths remain finite and no script errors are reported by jsdom.
+- Pulse series defaults to the lecture example A=2, T=4 s, w=2 s. Changing T preserves w/T. Turning DC off subtracts the same mean from the target and partial sum. Zero coefficients have no phase marker.
+- New calculations use closed-form continuous-time coefficients and integrals; SVG curves are sampled only for display. Touch behavior and browser-specific assistive-technology behavior require separate device testing.
