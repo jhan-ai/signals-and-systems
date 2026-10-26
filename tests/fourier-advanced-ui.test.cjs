@@ -4,7 +4,9 @@ const {JSDOM,VirtualConsole}=require('jsdom'),assert=require('node:assert/strict
  const errors=[],vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e.cause?.stack||e.message));const dom=await JSDOM.fromFile(path.join(__dirname,'../fourier/index.html'),{runScripts:'dangerously',resources:'usable',pretendToBeVisual:true,virtualConsole:vc});await new Promise(r=>dom.window.addEventListener('load',r,{once:true}));
  const w=dom.window,d=w.document,$=id=>d.getElementById(id);let checks=0;const ok=(v,m)=>{checks++;assert.ok(v,m);},click=id=>$(id).click(),input=(id,v,event='input')=>{$(id).value=v;$(id).dispatchEvent(new w.Event(event,{bubbles:true}));};
  const valid=()=>{ok(!/NaN|Infinity|undefined/.test(d.body.textContent),'finite labels');ok([...d.querySelectorAll('svg path')].every(e=>!/NaN|Infinity/.test(e.getAttribute('d'))),'finite paths');const ids=[...d.querySelectorAll('[id]')].map(e=>e.id);ok(new Set(ids).size===ids.length,'unique IDs');};
- ok(!d.querySelector('#tab-pair,#panel-pair,#extract-progress,#cos-product'),'removed experiments and area UI');ok(d.querySelectorAll('.tabs [role=tab]').length===3,'three tabs');ok(!/Gibbs|면적|누적 적분|약 9%/.test(d.body.textContent),'no unsupported explanatory material');
+ const seriesSection=$('fourier-series-section');
+ ok(seriesSection,'Fourier series has its own section');
+ ok(!d.querySelector('#tab-pair,#panel-pair,#extract-progress,#cos-product'),'removed experiments and area UI');ok(seriesSection.querySelectorAll('.tabs [role=tab]').length===3,'three preserved series tabs');ok(!/Gibbs|면적|누적 적분|약 9%/.test(seriesSection.textContent),'no removed material restored in the series section');
  click('tab-detect');ok($('detect-inner-value').textContent==='1.6','T=2 inner product');ok($('detect-coefficient-value').textContent==='0.8','divide by T');ok($('detect-rows').querySelectorAll('tr').length===3,'slide 148 three rows');ok($('orthogonality-calculation').textContent.includes('서로 직교'),'different basis proof');
  $('detect-rows').querySelector('[data-inspect-k="2"]').click();ok($('orthogonality-calculation').textContent.includes('같은 기저끼리의 내적은 T'),'same basis proof');
  input('detect-period',4);ok($('detect-inner-value').textContent==='3.2'&&$('detect-coefficient-value').textContent==='0.8','T changes inner product but not coefficient');input('detect-m',4);ok($('detect-coefficient-value').textContent==='0','absent component');ok($('detect-rows').querySelector('.matching-row').textContent.includes('0'),'zero-coefficient same-basis case');
@@ -14,7 +16,18 @@ const {JSDOM,VirtualConsole}=require('jsdom'),assert=require('node:assert/strict
  input('pulse-width',1);input('series-k',4);ok($('series-coefficient-value').textContent==='0','changed pulse zero');input('pulse-period',8);ok(+$('pulse-width').value===2,'T preserves width ratio');input('pulse-a',0);valid();input('pulse-a',2);input('pulse-width',8);input('series-k',0);ok($('series-coefficient-value').textContent==='2','full-width constant');input('harmonics',0);ok($('series-conclusion').textContent.includes('DC 성분만'),'DC-only sum');valid();
  for(const example of ['lecture','coefficients']){input('series-example',example,'change');ok($('pulse-controls').hidden,'hide pulse controls');input('series-k',-1);ok($('series-phase-value').textContent==='−π/4 rad','given phase');input('harmonics',3);ok($('series-conclusion').textContent.includes('원래 x(t)와 같습니다'),'finite example exact reconstruction');input('harmonics',2);ok(!$('series-conclusion').textContent.includes('원래 x(t)와 같습니다'),'partial reconstruction distinct');valid();}
  input('series-example','coefficients','change');input('series-k',0);ok($('series-coefficient-value').textContent==='6','example 5-3 DC');input('series-k',1);ok($('series-magnitude').textContent==='2','example 5-3 positive coefficient');input('series-k',3);ok($('series-magnitude').textContent==='1','example 5-3 third coefficient');
- click('reset-series');ok($('series-example').value==='pulse'&&+$('harmonics').value===5&&w.FourierLesson.snapshot().series.A===2,'series reset');input('harmonics',49);valid();
+ click('reset-series');ok($('series-example').value==='pulse'&&+$('harmonics').value===5&&w.FourierLesson.snapshot().series.A===2,'series reset');
+ const power=id=>Number.parseFloat($(id).textContent.replace('−','-'));
+ ok(power('series-power-total')===2,'pulse average power A²w/T');
+ const partial5=power('series-power-partial');
+ ok(partial5>1&&partial5<2,'finite pulse partial sum has less power than the full signal');
+ input('harmonics',0);ok(power('series-power-partial')===1,'DC-only pulse power is X0 squared');
+ input('harmonics',49);ok(power('series-power-partial')>partial5&&power('series-power-partial')<=2,'power approaches full pulse power with additional harmonics');valid();
+ input('series-example','lecture','change');ok(power('series-power-total')===3.5&&power('series-power-partial')===3.5,'lecture signal time power equals complete coefficient sum');
+ input('harmonics',0);ok(power('series-power-partial')===1,'lecture DC power distinct from total power');
+ input('series-example','coefficients','change');ok(power('series-power-total')===46&&power('series-power-partial')===46,'given-coefficient example full power');
+ input('harmonics',2);ok(power('series-power-partial')===44,'omitted third-frequency pair accounts for remaining power');
+ click('reset-series');input('pulse-a',0);ok(power('series-power-total')===0&&power('series-power-partial')===0,'zero signal power');valid();click('reset-series');
  $('tab-series').dispatchEvent(new w.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));ok($('tab-synth').getAttribute('aria-selected')==='true','keyboard wrap');$('tab-synth').dispatchEvent(new w.KeyboardEvent('keydown',{key:'End',bubbles:true}));ok($('tab-series').getAttribute('aria-selected')==='true','End tab');
  ok(errors.length===0,JSON.stringify(errors));dom.window.close();console.log(`Slide-aligned Fourier UI passed (${checks} checks)`);
 })().catch(e=>{console.error(e);process.exitCode=1;});

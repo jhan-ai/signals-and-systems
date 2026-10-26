@@ -90,6 +90,7 @@ function render(){
   $('preset-status').hidden=$('preset').value!=='custom';if(state.tab==='synth')renderSynth();else if(state.tab==='detect')window.FourierLesson?.detect();else window.FourierLesson?.series();}
 function setTab(tab,focus=false){
   if(!['synth','detect','series'].includes(tab))throw new Error('Unknown experiment');
+  window.FourierSections?.show('series');
   state.tab=tab;
   for(const t of ['synth','detect','series']){$('panel-'+t).hidden=t!==tab;$('tab-'+t).setAttribute('aria-selected',t===tab);$('tab-'+t).tabIndex=t===tab?0:-1;}
   if(focus)$('tab-'+tab).focus();render();

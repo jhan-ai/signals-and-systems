@@ -11,8 +11,8 @@
     "number": 2,
     "slug": "fourier",
     "title": "푸리에",
-    "chapter": "5장 · 주파수 영역 해석",
-    "description": "sinusoids 합성·분석과 푸리에 급수",
+    "chapter": "5·6장 · 주파수 영역 해석",
+    "description": "급수의 합성·분석에서 연속 스펙트럼, 시간 변환과 주파수 응답까지 연결합니다.",
     "advanced": false
   }
 ]

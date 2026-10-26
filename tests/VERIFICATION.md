@@ -70,3 +70,16 @@ This revision supersedes the earlier Fourier interactive design described above.
 - DOM tests do not validate mobile touch or browser-specific assistive-technology behavior.
 
 - Public Chrome check: three tabs visible; the removed pair is absent; the default T=2 example displays inner product 1.6 and coefficient 0.8; selecting pulse k=2 produces coefficient 0 and undefined phase. Display inspection identified and removed nested MathML scrollbar artifacts.
+
+## 2026-10-26: Continuous-time Fourier transform extension
+
+- LAB 02 now has Fourier-series and Fourier-transform groups. The three lecture-aligned series experiments remain available; the transform group adds fixed-width pulse trains approaching a single pulse, time scaling/translation, and a first-order system's frequency response. No discrete-time experiments were added.
+- `npm test`: 8,907 checks passed (7,383 original, 640 extensions, 78 expression, 582 lecture-aligned Fourier, 224 transform). Transform checks use independent time-domain quadrature for spectra and convolution, as well as exact energy, pulse, scaling and Parseval cases.
+- `npm run test:ui`: 972 checks passed (604 original, 47 expression, 71 lecture-aligned Fourier, 250 transform). No unhandled jsdom script errors. This includes group/tab routing and keyboard navigation, fixed-axis raw/normalized coefficients, signal selection and presets, both response modes, finite SVG coordinates, duplicate-ID checks and standalone SVG XML parsing.
+- The bridge holds pulse width and amplitude fixed while T changes. The display distinguishes X_k, T X_k, and the 2π X_k impulse weights of a periodic signal's transform. The raw coefficient view uses a fixed vertical scale so the 1/T decrease remains visible.
+- Time changes implement y(t)=A x(a(t−t₀)), a>0, with Y(ω)=(A/a) exp(−jωt₀) X(ω/a). Area and energy use whole-domain theoretical values. Undefined phase near spectral zeros and wrapped phase boundaries is not connected by misleading lines.
+- The first-order system uses h(t)=a exp(−at)u(t), H(ω)=a/(a+jω). Sinusoidal mode explicitly shows steady-state response; the causal pulse mode shows the full zero-initial-state response, including the tail after the pulse ends.
+- The series Parseval card distinguishes full-signal mean power from the power of the −N…N partial sum. The zero-signal case avoids dividing by zero. The detector's T control is labeled as the signal period.
+- Chrome preview: desktop graph rendering and controls inspected for all three transform experiments. At T=16 the bridge displays Δω=0.393 rad/s, X₀=0.125 and T X₀=2. The 2× compression preset displays area and energy 2→1. The 0–2 s pulse produces the expected rise and decay.
+- Responsive check: a 390 px iframe (375 px content width with scrollbar) displayed stacked controls, MathML, SVG graphs and the series Parseval card without document-level horizontal overflow. The default pulse series at N=5 displayed P=2, P_N=1.9331 and 96.65%.
+- These rendering checks use desktop Chrome at two viewport widths. They do not establish physical-device touch behavior or cross-browser assistive-technology compatibility.

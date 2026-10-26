@@ -43,7 +43,7 @@ window.FourierLesson=(()=>{
  function detect(){
   const terms=currentSource(),{source,m}=detectState,period=detectT(),z=F.coefficient(terms,m),raw=F.inner(terms,m,period);
   $('detect-period').disabled=source==='synth';$('detect-period').value=period;$('detect-period-value').textContent=fmt(period)+' s';
-  $('detect-period-note').textContent=source==='synth'?'01의 모든 성분은 정수 Hz입니다. 공통 주기 T=1 s를 내적 구간으로 사용합니다.':`구간 [0, ${fmt(period)}] · f₀ = 1/T = ${fmt(1/period,3)} Hz`;
+  $('detect-period-note').textContent=source==='synth'?'01의 모든 성분은 정수 Hz입니다. 공통 주기 T=1 s를 내적 구간으로 사용합니다.':`한 주기 [0, ${fmt(period)}]에서 내적합니다. T를 바꾸면 신호의 기본 주파수 f₀ = 1/T = ${fmt(1/period,3)} Hz도 함께 바뀝니다.`;
   $('detect-example-note').textContent=source==='three'?'148쪽의 세 성분 X₁, X₂, X₃에 각각 1, 0.8, 0.5를 넣은 예시입니다.':source==='lecture'?'154쪽의 신호에 T를 지정하여 같은 방식으로 내적합니다.':'01에서 조절한 신호의 계수를 내적으로 구합니다.';
   $('edit-detect-source').hidden=source!=='synth';$('detect-m-value').textContent=`m = ${m} · ${fmt(m/period,3)} Hz`;
   $('detect-basis').innerHTML=math(basis(m));$('detect-conjugate').innerHTML=math(basis(-m));
@@ -132,6 +132,18 @@ window.FourierLesson=(()=>{
   if(pulse)plotPulseStep(graph,A,period,w);else graph.path(t=>F.signal(terms,t,period).re,'#8b9699',1.8,{dash:'6 5'});
   graph.path(t=>pulse?F.pulseSum(A,period,w,N,t):F.signal(terms,t,period,N).re,ink,2.6,{samples:Math.max(800,N*60)});
   $('series-conclusion').textContent=N===0?'N=0: X₀만 더했으므로 DC 성분만 남습니다.':!pulse&&N>=3?'0이 아닌 계수 X₀, X±₁, X±₃을 모두 포함했습니다. 이 예제에서는 합성한 신호가 원래 x(t)와 같습니다.':`−${N}≤k≤${N}의 항을 더했습니다. ${Math.abs(k)>N?`선택한 X${k}는 아직 이 합에 포함되지 않습니다.`:Math.hypot(z.re,z.im)<1e-9?`X${k}=0이므로 해당 항을 더해도 합은 변하지 않습니다.`:`선택한 X${k}도 이 합에 사용됩니다.`}`;
+  const power=seriesPower(),ratio=power.total>0?Math.min(1,power.partial/power.total):0;
+  $('series-power-total').textContent=fmt(power.total,4);
+  $('series-power-partial').textContent=fmt(power.partial,4);
+  $('series-power-ratio').textContent=power.total>0?`${fmt(100*ratio,2)}%`:'—';
+  $('series-power-meter').value=ratio;
+  $('series-power-note').textContent=power.total===0?'원래 신호와 부분합이 모두 0이므로 전력 비율은 계산하지 않습니다.':`N=${N}: 아직 포함되지 않은 성분의 전력은 P−Pₙ=${fmt(power.residual,5)}입니다. ${power.residual<1e-10?'이 예제의 모든 전력이 부분합에 포함되었습니다.':'원래 신호의 전체 전력 P와 현재 부분합의 전력 Pₙ을 구별하세요.'}`;
+ }
+ function seriesPower(){
+  const Q=window.FourierTransformMath;
+  if(seriesState.example==='pulse')return Q.pulsePower(seriesState.A,seriesState.T,seriesState.D*seriesState.T,seriesState.N);
+  const terms=seriesTerms(),total=Q.finiteSeriesPower(terms),partial=Q.finiteSeriesPower(terms,seriesState.N);
+  return {total,partial,residual:Math.max(0,total-partial)};
  }
  function resetDetect(){Object.assign(detectState,{source:'three',T:2,m:2,inspectK:1});$('detect-example').value='three';$('detect-period').value=2;$('detect-m').value=2;detect();}
  function resetSeries(){Object.assign(seriesState,{example:'pulse',A:2,T:4,D:.5,k:1,N:5});$('series-example').value='pulse';$('series-k').value=1;$('harmonics').value=5;series();}
@@ -146,7 +158,7 @@ window.FourierLesson=(()=>{
  $('pulse-width').addEventListener('input',e=>{seriesState.D=+e.target.value/seriesState.T;series();});
  $('pulse-example').addEventListener('click',()=>{seriesState.A=2;seriesState.T=4;seriesState.D=.5;series();});
  for(const key of ['k','n'])document.querySelectorAll(`[data-${key}]`).forEach(b=>b.addEventListener('click',()=>{seriesState[key==='n'?'N':'k']=+b.dataset[key];$(key==='n'?'harmonics':'series-k').value=b.dataset[key];series();}));
- const snapshot=()=>({experiment:state.tab,components:state.parts.map(p=>({...p})),dc:state.dc,detect:{...detectState,T:detectT(),inner:F.inner(currentSource(),detectState.m,detectT()),coefficient:F.coefficient(currentSource(),detectState.m)},series:{...seriesState,w:seriesState.D*seriesState.T,coefficient:seriesCoefficient(seriesState.k)}});
+ const snapshot=()=>({experiment:state.tab,components:state.parts.map(p=>({...p})),dc:state.dc,detect:{...detectState,T:detectT(),inner:F.inner(currentSource(),detectState.m,detectT()),coefficient:F.coefficient(currentSource(),detectState.m)},series:{...seriesState,w:seriesState.D*seriesState.T,coefficient:seriesCoefficient(seriesState.k),power:seriesPower()}});
  // Browser tooling controls the same fields as the visible UI; removed experiments are not registered.
  if(document.modelContext?.registerTool){
   const controller=new AbortController(),register=tool=>{try{Promise.resolve(document.modelContext.registerTool(tool,{signal:controller.signal})).catch(()=>{});}catch{}};

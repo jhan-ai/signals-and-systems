@@ -3,17 +3,22 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>푸리에 실험실 · 신호및시스템</title>
-  <meta name="description" content="sinusoids의 진폭·주파수·위상을 바꾸며 신호 합성, 주파수 분석, 푸리에 급수를 체험하세요.">
+  <meta name="description" content="푸리에 급수에서 푸리에 변환까지: 신호 합성·분석, 시간 이동·압축, 주파수 응답을 직접 조절하며 확인합니다.">
   <meta name="theme-color" content="#b93233">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="stylesheet" href="style.css?v=20261005-3">
-  <script defer src="math.js?v=20261007-3"></script><script defer src="advanced-math.js?v=20261007-3"></script><script defer src="app.js?v=20261007-3"></script>
-<link rel="stylesheet" href="../labs/style.css?v=20261005-3"><link rel="stylesheet" href="../assets/course.css?v=20261005-3"><link rel="stylesheet" href="advanced.css?v=20261007-3"><script defer src="advanced.js?v=20261007-3"></script></head>
+  <script defer src="math.js?v=20261007-3"></script><script defer src="advanced-math.js?v=20261007-3"></script><script defer src="transform-math.js?v=20261026-1"></script><script defer src="app.js?v=20261026-1"></script>
+<link rel="stylesheet" href="../labs/style.css?v=20261005-3"><link rel="stylesheet" href="../assets/course.css?v=20261005-3"><link rel="stylesheet" href="advanced.css?v=20261007-3"><link rel="stylesheet" href="sections.css?v=20261026-1"><link rel="stylesheet" href="transform.css?v=20261026-1"><script defer src="advanced.js?v=20261026-1"></script><script defer src="transform.js?v=20261026-1"></script><script defer src="sections.js?v=20261026-1"></script></head>
 <body>
-<a class="skip" href="#lab">실험으로 건너뛰기</a>
+<a class="skip" href="#fourier-sections">실험으로 건너뛰기</a>
 <header class="topbar"><div class="brand"><a class="home-link" href="../" aria-label="신호 및 시스템 홈페이지"><span class="brandmark" aria-hidden="true">∿</span><span>26년 2학기 신호 및 시스템</span></a><span class="brand-divider" aria-hidden="true">/</span><strong>푸리에 실험실</strong></div><a class="all-labs" href="../">실험실 목록</a></header>
 <main>
-  <div class="intro"><div><p class="eyebrow">LAB 02</p><h1>푸리에</h1><p class="lead"><span class="goal-label">학습 목표</span> sinusoids의 합성·분석과 푸리에 급수의 관계 이해</p><p class="course-reference">강의 연계 · 5장 주파수 영역 해석 — 푸리에 급수</p></div></div>
+  <div class="intro"><div><p class="eyebrow">LAB 02</p><h1>푸리에</h1><p class="lead"><span class="goal-label">학습 목표</span> 신호의 합성·분석에서 푸리에 변환과 시스템 출력까지</p><p class="course-reference">강의 연계 · 5장 푸리에 급수 · 6장 푸리에 변환</p></div></div>
+  <nav class="fourier-sections" id="fourier-sections" role="tablist" aria-label="푸리에 학습 영역" tabindex="-1">
+    <button id="section-series" role="tab" aria-controls="fourier-series-section" aria-selected="true" data-fourier-section="series"><span class="section-kicker">5장</span><strong>푸리에 급수</strong><span class="section-caption">주기 신호의 합성·분석</span></button>
+    <button id="section-transform" role="tab" aria-controls="fourier-transform-section" aria-selected="false" tabindex="-1" data-fourier-section="transform"><span class="section-kicker">6장</span><strong>푸리에 변환</strong><span class="section-caption">연속 스펙트럼과 주파수 응답</span></button>
+  </nav>
+  <section id="fourier-series-section" role="tabpanel" aria-labelledby="section-series">
   <section class="definition" aria-labelledby="fourier-definition"><h2 id="fourier-definition">푸리에 급수 표현</h2>
 <div class="definition-formula"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="x(t)는 a0 더하기 k=1부터 무한대까지 ak cos(2파이 k f0 t)와 bk sin(2파이 k f0 t)의 합으로 표현합니다."><mrow><mi>x</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><msub><mi>a</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>∞</mi></munderover><mrow><mo>[</mo><msub><mi>a</mi><mi>k</mi></msub><mi mathvariant="normal">cos</mi><mo>(</mo><mn>2</mn><mi>π</mi><mi>k</mi><msub><mi>f</mi><mn>0</mn></msub><mi>t</mi><mo>)</mo><mo>+</mo><msub><mi>b</mi><mi>k</mi></msub><mi mathvariant="normal">sin</mi><mo>(</mo><mn>2</mn><mi>π</mi><mi>k</mi><msub><mi>f</mi><mn>0</mn></msub><mi>t</mi><mo>)</mo><mo>]</mo></mrow></mrow></math></div>
 <p><strong>a₀</strong> DC 성분(평균값) · <strong>f₀ = 1/T</strong> 기본 주파수 · <strong>aₖ, bₖ</strong> 각 성분의 계수</p><p>k=1은 fundamental, k≥2는 harmonics입니다. 아래 ‘푸리에 급수’ 실험은 k=N까지만 더한 부분합을 표시합니다.</p>
@@ -45,7 +50,7 @@
     <div class="lab-grid"><aside class="controls"><div class="control-head"><h2>내적할 주파수</h2><button id="reset-detect" class="text-button">초기화</button></div>
       <label class="select-label" for="detect-example">예제 선택</label><select id="detect-example"><option value="three">세 성분 예시 · 148쪽</option><option value="lecture">DC + 1·3차 · 154쪽</option><option value="synth">01에서 만든 신호</option></select>
       <p id="detect-example-note" class="control-copy"></p>
-      <div class="series-control"><label for="detect-period">내적 구간의 길이 T <output id="detect-period-value"></output></label><input id="detect-period" type="range" min="1" max="4" step="1" value="2"><p id="detect-period-note" class="chart-note"></p></div>
+      <div class="series-control"><label for="detect-period">신호의 주기 T <output id="detect-period-value"></output></label><input id="detect-period" type="range" min="1" max="4" step="1" value="2"><p id="detect-period-note" class="chart-note"></p></div>
       <div class="series-control"><label for="detect-m">찾을 성분 m <output id="detect-m-value"></output></label><input id="detect-m" type="range" min="-10" max="10" step="1" value="2"><div class="quick-buttons" aria-label="내적할 성분 선택"><button data-m="0">0</button><button data-m="1">1</button><button data-m="2" aria-pressed="true">2</button><button data-m="3">3</button><button data-m="4">4</button></div></div>
       <div class="selected-basis"><span>내적할 기저 신호</span><div id="detect-basis" class="formula"></div><span>곱할 complex conjugate</span><div id="detect-conjugate" class="formula"></div></div>
       <div class="mini-explanation"><strong>m을 1, 2, 3, 4로 바꿔 보세요.</strong><p>어떤 성분의 내적만 0이 아닌지, 그 결과로 어떤 Xₘ을 얻는지 확인하세요.</p></div>
@@ -77,10 +82,22 @@
         <div class="plot-pair spectrum-pair"><div><h3>진폭 스펙트럼 |Xₖ|</h3><div id="series-amplitude" class="chart small"></div></div><div><h3>위상 스펙트럼 ∠Xₖ</h3><div id="series-phase" class="chart small"></div></div></div><p id="series-spectrum-note" class="chart-note"></p>
       </article>
       <article class="plot-card"><div class="plot-head"><div><p class="overline">03 · SYNTHESIS</p><h2>계수를 넣고 항들을 더하기</h2></div><span class="slide-badge">141·153–154쪽</span></div><div id="series-synthesis-formula" class="formula-stack"></div><div class="advanced-legend"><span><i class="line navy"></i> 선택한 차수까지의 합</span><span><i class="line dashed"></i> 원래 x(t)</span></div><div id="series-plot" class="chart large"></div><p id="series-conclusion" class="result-note" aria-live="polite"></p><p class="chart-note">푸리에 급수는 무한히 많은 항의 합입니다. 화면에서는 −N부터 N까지 유한 개의 항을 더한 부분합을 표시합니다. k=0은 DC, k=1은 fundamental, k≥2는 harmonics에 해당합니다.</p></article>
+      <article class="plot-card parseval-card" aria-labelledby="series-power-title">
+        <div class="plot-head"><div><p class="overline">PARSEVAL</p><h2 id="series-power-title">부분합에 포함된 평균 전력</h2></div></div>
+        <div class="formula"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="부분합의 평균 전력 P N은 마이너스 N부터 N까지 푸리에 계수 크기의 제곱을 더한 값입니다."><mrow><msub><mi>P</mi><mi>N</mi></msub><mo>=</mo><mfrac><mn>1</mn><mi>T</mi></mfrac><msubsup><mo>∫</mo><mn>0</mn><mi>T</mi></msubsup><msup><mrow><mo>|</mo><msub><mi>x</mi><mi>N</mi></msub><mo>(</mo><mi>t</mi><mo>)</mo><mo>|</mo></mrow><mn>2</mn></msup><mi mathvariant="normal">d</mi><mi>t</mi><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mo>−</mo><mi>N</mi></mrow><mi>N</mi></munderover><msup><mrow><mo>|</mo><msub><mi>X</mi><mi>k</mi></msub><mo>|</mo></mrow><mn>2</mn></msup></mrow></math></div>
+        <div class="coefficient-readout"><div><span>원래 신호의 평균 전력 P</span><strong id="series-power-total"></strong></div><div><span>부분합의 평균 전력 Pₙ</span><strong id="series-power-partial"></strong></div><div><span>포함된 전력의 비율</span><strong id="series-power-ratio"></strong></div></div>
+        <meter id="series-power-meter" min="0" max="1" value="0" aria-label="원래 신호의 평균 전력 중 부분합에 포함된 비율"></meter>
+        <p class="chart-note" id="series-power-note"></p>
+        <p class="chart-note">N을 늘리면 더 많은 계수가 합에 포함됩니다. 파스발 관계는 같은 신호의 전력을 시간 영역과 주파수 영역에서 계산한 값이 같다는 뜻입니다.</p>
+      </article>
     </div></div>
     <details class="concept"><summary>슬라이드 143–144쪽의 두 가지 표현</summary><div><p>같은 신호의 푸리에 급수를 삼각함수 또는 복소지수함수로 표현할 수 있습니다. 삼각함수형에서는 a₀, aₖ, bₖ를, 지수함수형에서는 Xₖ를 구합니다.</p><p>X₀=a₀, Xₖ=(aₖ−jbₖ)/2, X₋ₖ=(aₖ+jbₖ)/2입니다. 어떤 표현을 사용하더라도 나타내는 신호는 같습니다. 예제 5-3에서는 주어진 Xₖ를 대입하여 삼각함수의 합으로 바꾸는 과정을 확인할 수 있습니다.</p></div></details>
   </section>
   </div>
+  </section>
+  <section id="fourier-transform-section" role="tabpanel" aria-labelledby="section-transform" hidden>
+    <div id="fourier-transform-lab"></div>
+  </section>
   <nav class="ss-footer" aria-label="실험실 탐색"><a href="../convolution/">← LAB 01 Convolution</a><a href="../">실험실 목록</a></nav><footer class="course-footer"><span>26년 2학기 신호 및 시스템</span><span><a href="https://icnsl.github.io">지능정보융합학과 한종훈</a></span></footer>
 </main>
 <noscript><p>이 실험은 JavaScript를 활성화하면 사용할 수 있습니다.</p></noscript>
