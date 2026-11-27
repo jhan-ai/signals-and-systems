@@ -1,0 +1,26 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const M=require('../labs/lecture-math.js'),root=path.resolve(__dirname,'..');let cases=0,checks=0;const byLab={};
+function ok(v,m){checks++;assert.ok(v,m);}
+function near(a,b,label,tol=1e-8){ok(Number.isFinite(a)&&Math.abs(a-b)<=tol*Math.max(1,Math.abs(b)),label+`: ${a} versus ${b}`);}
+const fmt=(n,d=3)=>Number.isFinite(n)?String(Number(n.toFixed(d))):'—';
+const UI={row:(label,key,min,max,step=1,unit='')=>({label,key,min,max,step,unit}),select:(label,key,options)=>({label,key,options}),fmt};
+let seed=20261127;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+function values(c,state){if(c.options)return c.options.map(o=>o[0]);const hi=typeof c.max==='function'?c.max(state):c.max,step=c.step||1;const snap=x=>Number((c.min+Math.round((x-c.min)/step)*step).toFixed(8));return [...new Set([c.min,hi,snap((c.min+hi)/2),...[-1,0,1].filter(x=>x>=c.min&&x<=hi)])];}
+function makeStates(t){const states=[{...t.defaults},...(t.presets||[]).map(p=>({...t.defaults,...p.values}))];for(let i=0;i<t.controls.length;i++)for(let j=i;j<t.controls.length;j++){const a=t.controls[i],b=t.controls[j];for(const x of values(a,t.defaults)){const base={...t.defaults,[a.key]:x};if(t.normalize)t.normalize(base);for(const y of values(b,base)){const s={...base,[b.key]:y};if(t.normalize)t.normalize(s);states.push(s);}}}
+ // Random legal combinations test dependent bounds and interacting controls.
+ for(let n=0;n<120;n++){const s={...t.defaults};for(const c of t.controls){if(c.when&&!c.when(s))continue;if(c.options)s[c.key]=c.options[Math.floor(random()*c.options.length)][0];else{const hi=typeof c.max==='function'?c.max(s):c.max;const count=Math.round((hi-c.min)/c.step);s[c.key]=Number((c.min+Math.floor(random()*(count+1))*c.step).toFixed(8));}if(t.normalize)t.normalize(s);}states.push(s);}
+ return [...new Map(states.map(s=>[JSON.stringify(s),s])).values()];}
+for(const slug of ['fourier-properties','discrete','discrete-systems','dtfs']){let config;const context={LectureMath:M,LectureUI:{...UI,mount:c=>config=c},Math,Number};vm.runInNewContext(fs.readFileSync(path.join(root,slug,'app.js'),'utf8'),context);byLab[slug]={};for(const t of config.tabs){const states=makeStates(t);byLab[slug][t.id]=states.length;for(const s of states){cases++;let snapshot,plots=[],html=[],stats=[];const v={fmt,eq:s=>s,table:(h,r)=>JSON.stringify([h,r]),plot:(title,curves,opts)=>plots.push({title,curves,opts}),note:(a,b)=>html.push(a,b),html:s=>html.push(s),stats:s=>stats.push(...s),snapshot:s=>snapshot=s};t.draw(s,v);const label=slug+'/'+t.id+' '+JSON.stringify(s);ok(plots.length>=2,label+' plots');ok(!/undefined|NaN|Infinity|\bWeek\b|W\d+-\d+|슬라이드\s*\d|\d[\d·–-]*쪽/.test(html.join(' ')+JSON.stringify(stats)),label+' valid text');
+for(const p of plots){ok(p.opts.xmax>p.opts.xmin,label+' x range');for(const curve of p.curves){const vals=curve.points||Array.from({length:49},(_,i)=>{const x=p.opts.xmin+(p.opts.xmax-p.opts.xmin)*i/48;return [x,curve.fn(x)];});for(const[x,y]of vals){ok(Number.isFinite(x),label+' finite x');ok(Number.isFinite(y)||/위상/.test(p.title)&&Number.isNaN(y),label+' finite y or undefined phase');}}}
+if(slug==='discrete'&&t.id==='sampling'){ok(snapshot.maxError<1e-10,label+' identical alias samples');near(snapshot.other,s.f+s.q*s.fs,label+' aliased frequency');}
+if(slug==='discrete'&&t.id==='theorem')ok(snapshot.overlap===(s.fs<2*s.B),label+' spectral overlap');
+if(slug==='discrete'&&t.id==='adc')for(const o of snapshot.values){ok(o.code.length===s.bits,label+' bit count');near(-1+2*parseInt(o.code,2)/(2**s.bits-1),o.q,label+' code decodes');ok(Math.abs(o.q-o.x)<=1/(2**s.bits-1)+1e-12,label+' quantization error bound');}
+if(slug==='discrete-systems'&&t.id==='convolution'){const a=s.x==='triangle'?[1,2,1]:[1,1,1,1],b=s.h==='pulse'?[1,1,1]:s.h==='difference'?[1,-1]:[1,.5,.25];let sum=0;for(let k=-1;k<a.length-1;k++)sum+=a[k+1]*(b[s.n-k]||0);near(snapshot.sum,sum,label+' convolution at n');ok(snapshot.out.length===a.length+b.length-1,label+' convolution length');}
+if(slug==='discrete-systems'&&t.id==='recurrence')snapshot.y.forEach((y,n)=>{near(y,s.a*(n?snapshot.y[n-1]:s.initial)+snapshot.x[n],label+' recurrence');near(y,snapshot.zs[n]+snapshot.zi[n],label+' response decomposition');});
+if(slug==='discrete-systems'&&t.id==='classical')snapshot.parts.forEach((p,n)=>near(p.total,snapshot.rec[n],label+' closed form versus recursion'));
+if(slug==='dtfs'&&t.id==='periodicity')ok(snapshot.maxError<1e-10,label+' frequency periodicity');
+if(slug==='dtfs'&&t.id==='synthesis'){if(s.count===s.N)ok(snapshot.error<1e-10,label+' complete reconstruction');near(snapshot.x.reduce((sum,x)=>sum+x*x,0)/s.N,snapshot.c.reduce((sum,c)=>sum+M.abs(c)**2,0),label+' DTFS Parseval');for(let k=0;k<s.N;k++){near(snapshot.c[k].re,snapshot.c[M.mod(-k,s.N)].re,label+' real conjugate symmetry');near(snapshot.c[k].im,-snapshot.c[M.mod(-k,s.N)].im,label+' imaginary conjugate symmetry');}}
+if(slug==='dtfs'&&t.id==='orthogonality'){near(snapshot.sum.re,s.k===s.m?s.N:0,label+' basis inner product real');near(snapshot.sum.im,0,label+' basis inner product imaginary');}
+}}}
+console.log(JSON.stringify({status:'passed',parameterCases:cases,assertions:checks,byLab},null,2));

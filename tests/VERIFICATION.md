@@ -92,3 +92,15 @@ This revision supersedes the earlier Fourier interactive design described above.
 - Shared SVG renderer accepts optional width and integer x ticks. Existing callers retain their behavior. Existing math/UI suites run alongside the new tests.
 - Chrome preview visually checked the homepage filtering, sampling presets, spectral replication, DTFS, and 2nd-order repeated-root selection. At a 390px iframe width (375px content viewport after scrollbar), DTFS and classical-solution pages have no document horizontal overflow; controls stack and graphs remain readable. This checks a narrow rendered viewport, not a physical phone.
 - Browser-extension metadata errors were unrelated to the site's scripts; DOM integration tests found no site script errors.
+
+
+## 2026-11-27: Consistent titles, navigation and expanded regression checks
+
+- All seven pages now use 신호 및 시스템 실험실 as the site identity. Removed semester, Week, slide-page labels and the homepage lecture-mapping section. Chapter and example identifiers remain because they describe content rather than slide locations.
+- All six labs share a previous / all labs / next navigation sequence matching the homepage catalog. Existing deep links and concept-to-concept links remain valid.
+- Corrected the ideal-filter explanation: the bandstop filter blocks its boundary frequencies; lowpass, highpass and bandpass include their boundaries. The calculation already used that convention.
+- All existing suites passed: mathematics 11,338 assertions; DOM interaction 3,602 assertions, including 203 new-lab scenarios. These cover presets, reset, select options, slider limits, keyboard controls, finite SVG coordinates and SVG export validation.
+- `experiment-sweep.test.cjs`: 2,407 distinct parameter cases across the 18 new tabs, 547,459 assertions. Uses deterministic pairwise boundary combinations and seeded random legal combinations. Checks actual draw functions and independently verifies sampled alias equality, quantization bounds and binary decoding, convolution, recurrence decomposition, closed-form/recursive agreement, DTFS reconstruction, Parseval and orthogonality. Counts are assertions, not separate browser sessions.
+- `site-consistency.test.cjs`: 627 checks, seven pages, 23 direct routes, 59 internal hyperlinks, zero script errors. Covers title and label cleanup after tab/option changes, sequential navigation, skip-link behavior, local assets and anchor targets.
+- Chrome preview: inspected desktop homepage plus narrow home, legacy Fourier and sampling pages at a 390px iframe width (375px content viewport). No document-level horizontal overflow; tabs and controls wrap, the common navigation stacks, and keyboard focus stays visible. Wide formulas scroll inside their own container. This does not establish physical touch-device or cross-browser coverage.
+- Test commands are available together through `npm run test:all`. Historical entries above describe earlier revisions, including superseded slide-reference labels.

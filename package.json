@@ -5,7 +5,10 @@
   "description": "Static, Korean interactive signals and systems teaching labs",
   "scripts": {
     "test": "node tests/math.test.cjs && node tests/extensions.test.cjs && node tests/expression.test.cjs && node tests/fourier-advanced.test.cjs && node tests/transform-math.test.cjs && node tests/lecture-math.test.cjs",
-    "test:ui": "node tests/ui.test.cjs && node tests/expression-ui.test.cjs && node tests/fourier-advanced-ui.test.cjs && node tests/transform-ui.test.cjs && node tests/lecture-ui.test.cjs"
+    "test:ui": "node tests/ui.test.cjs && node tests/expression-ui.test.cjs && node tests/fourier-advanced-ui.test.cjs && node tests/transform-ui.test.cjs && node tests/lecture-ui.test.cjs",
+    "test:sweep": "node tests/experiment-sweep.test.cjs",
+    "test:site": "node tests/site-consistency.test.cjs",
+    "test:all": "npm test && npm run test:ui && npm run test:sweep && npm run test:site"
   },
   "devDependencies": {
     "jsdom": "30.1.2"

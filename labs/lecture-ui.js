@@ -21,7 +21,7 @@
       if(i<0||i>=config.tabs.length)i=0;index=i;const t=config.tabs[i];state={...t.defaults};
       tabs.querySelectorAll('button').forEach((b,j)=>{b.setAttribute('aria-selected',String(j===i));b.tabIndex=j===i?0:-1;b.setAttribute('aria-controls','lesson-panel');});
       results.id='lesson-panel';results.setAttribute('aria-labelledby','tab-'+t.id);
-      intro.innerHTML=`<div><p class="lesson-source">${t.source}</p><h2>${t.title}</h2><p>${t.goal}</p></div><button type="button" class="lesson-export">그래프 SVG 저장</button>`;
+      intro.innerHTML=`<div><h2>${t.title}</h2><p>${t.goal}</p></div><button type="button" class="lesson-export">그래프 SVG 저장</button>`;
       intro.querySelector('button').onclick=exportGraphs;
       controls.innerHTML='<div class="lesson-control-head"><h3>직접 바꿔보기</h3><button type="button" data-reset>초기화</button></div>';
       for(const c of t.controls){const id='control-'+c.key;const d=document.createElement('div');d.className='lesson-control';
@@ -31,7 +31,7 @@
       const guide=document.createElement('p');guide.className='lesson-hint';guide.textContent=t.hint;controls.append(guide);
       controls.querySelector('[data-reset]').onclick=()=>{state={...t.defaults};render();};render();
       if(update){try{history.replaceState(null,'','#'+t.id);}catch{/* Local file previews may disallow history updates. */}}
-      document.title=t.title+' · '+config.title+' · 신호 및 시스템';
+      document.title=t.title+' · '+config.title+' · 신호 및 시스템 실험실';
     }
     config.tabs.forEach((t,i)=>{const b=document.createElement('button');b.id='tab-'+t.id;b.type='button';b.textContent=t.name;b.setAttribute('role','tab');b.setAttribute('aria-controls','panel-'+t.id);b.onclick=()=>choose(i);b.onkeydown=e=>{let j=i;if(e.key==='ArrowRight')j=(i+1)%config.tabs.length;else if(e.key==='ArrowLeft')j=(i+config.tabs.length-1)%config.tabs.length;else if(e.key==='Home')j=0;else if(e.key==='End')j=config.tabs.length-1;else return;e.preventDefault();choose(j);tabs.children[j].focus();};tabs.append(b);});
     controls.addEventListener('input',e=>{if(e.target.dataset.key){state[e.target.dataset.key]=e.target.tagName==='SELECT'?e.target.value:Number(e.target.value);render();}});

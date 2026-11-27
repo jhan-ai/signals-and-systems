@@ -23,7 +23,7 @@ window.FourierLesson=(()=>{
  function sourceEquation(terms){return math(mi('x')+wrap(t)+eq+(terms.length?terms.map(z=>zMath(z)+(z.k===0?'':exponent(z.k))).join(mo('+')):mn(0)));}
  function renderProof(){
   const k=detectState.inspectK,m=detectState.m,q=k-m,period=detectT(),z=F.coefficient(currentSource(),k);
-  $('orthogonality-title').textContent=`k = ${k}, m = ${m}의 내적 계산 · 145–146쪽`;
+  $('orthogonality-title').textContent=`k = ${k}, m = ${m}의 내적 계산`;
   const left=mo('⟨')+basis(k)+mo(',')+basis(m)+mo('⟩'),power=j+mn(2)+mi('π')+wrap(mn(k)+mo('−')+mn(m))+frac(t,T);
   let lines=[math(left+eq+integral(mn(0),T,exp(power)))];
   if(q===0){
@@ -44,7 +44,7 @@ window.FourierLesson=(()=>{
   const terms=currentSource(),{source,m}=detectState,period=detectT(),z=F.coefficient(terms,m),raw=F.inner(terms,m,period);
   $('detect-period').disabled=source==='synth';$('detect-period').value=period;$('detect-period-value').textContent=fmt(period)+' s';
   $('detect-period-note').textContent=source==='synth'?'01의 모든 성분은 정수 Hz입니다. 공통 주기 T=1 s를 내적 구간으로 사용합니다.':`한 주기 [0, ${fmt(period)}]에서 내적합니다. T를 바꾸면 신호의 기본 주파수 f₀ = 1/T = ${fmt(1/period,3)} Hz도 함께 바뀝니다.`;
-  $('detect-example-note').textContent=source==='three'?'148쪽의 세 성분 X₁, X₂, X₃에 각각 1, 0.8, 0.5를 넣은 예시입니다.':source==='lecture'?'154쪽의 신호에 T를 지정하여 같은 방식으로 내적합니다.':'01에서 조절한 신호의 계수를 내적으로 구합니다.';
+  $('detect-example-note').textContent=source==='three'?'세 성분 X₁, X₂, X₃에 각각 1, 0.8, 0.5를 넣은 예시입니다.':source==='lecture'?'DC와 1·3차 성분의 신호에 T를 지정하여 같은 방식으로 내적합니다.':'01에서 조절한 신호의 계수를 내적으로 구합니다.';
   $('edit-detect-source').hidden=source!=='synth';$('detect-m-value').textContent=`m = ${m} · ${fmt(m/period,3)} Hz`;
   $('detect-basis').innerHTML=math(basis(m));$('detect-conjugate').innerHTML=math(basis(-m));
   document.querySelectorAll('[data-m]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.m===m));
@@ -106,7 +106,7 @@ window.FourierLesson=(()=>{
   $('pulse-a-value').textContent=fmt(A);$('pulse-period-value').textContent=fmt(storedT)+' s';$('pulse-width-value').textContent=fmt(w,3)+' s';$('pulse-period-note').textContent='중심은 t=0입니다. T를 바꾸면 폭의 비율 w/T를 유지합니다.';
   $('series-k-value').textContent=`k = ${k}`;$('harmonics-value').textContent=`N = ${N}`;
   document.querySelectorAll('[data-k]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.k===k));document.querySelectorAll('[data-n]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.n===N));
-  $('series-example-note').textContent=pulse?'152쪽의 예제 5-5에서 시작합니다. A, T, w를 바꾸며 같은 계수 계산식을 적용해 보세요.':given?'150쪽의 예제 5-3입니다. 주어진 Xₖ를 급수에 대입하고 삼각함수의 합으로 나타냅니다.':'154쪽의 신호입니다. 시간 영역의 신호와 진폭·위상 스펙트럼을 연결합니다.';
+  $('series-example-note').textContent=pulse?'예제 5-5에서 시작합니다. A, T, w를 바꾸며 같은 계수 계산식을 적용해 보세요.':given?'예제 5-3입니다. 주어진 Xₖ를 급수에 대입하고 삼각함수의 합으로 나타냅니다.':'DC와 1·3차 성분의 신호입니다. 시간 영역의 신호와 진폭·위상 스펙트럼을 연결합니다.';
   $('series-period').textContent=`T = ${fmt(period)} s · f₀ = ${fmt(1/period,3)} Hz`;
   $('series-source-overline').textContent=given?'01 · GIVEN COEFFICIENTS':'01 · TIME DOMAIN';$('series-operation').textContent=given?'02 · SPECTRUM':'02 · ANALYSIS';
   $('series-source-title').textContent=given?'주어진 푸리에 계수':'주기 신호 x(t)';$('series-source').hidden=given;
@@ -115,7 +115,7 @@ window.FourierLesson=(()=>{
   const bound=pulse?Math.max(1,A*1.35):terms.reduce((s,z)=>s+Math.hypot(z.re,z.im),0)*1.12;
   const plotOptions={xmin:pulse?-period:0,xmax:pulse?period:2*period,xticks:pulse?[-period,-period/2,0,period/2,period]:[0,.5,1,1.5,2],ymin:pulse?-Math.max(.3,A*.3):-bound,ymax:bound,yticks:pulse?[0,A/2,A].filter((v,i,a)=>a.indexOf(v)===i):[-bound,0,bound]};
   if(!given){const src=chart('series-source',{...plotOptions,title:'계수를 구할 원래 주기 신호'});if(pulse)plotPulseStep(src,A,period,w);else src.path(t=>F.signal(terms,t,period).re);}
-  $('series-slide').textContent=pulse?'152쪽':given?'150쪽':'154쪽';$('series-coefficient-title').textContent=given?'계수와 스펙트럼 읽기':'푸리에 계수 Xₖ 계산';
+  $('series-coefficient-title').textContent=given?'계수와 스펙트럼 읽기':'푸리에 계수 Xₖ 계산';
   if(pulse)$('series-coefficient-formula').innerHTML=pulseDerivation();
   else if(given)$('series-coefficient-formula').innerHTML=math(X(k)+eq+zMath(z))+`<p>예제에서 주어진 계수입니다. X<sub>${k}</sub>가 주파수 ${k} Hz 성분의 크기와 위상을 결정합니다.</p>`;
   else $('series-coefficient-formula').innerHTML=math(X('k')+eq+generalCoefficient)+sourceEquation(terms)+math(X(k)+eq+frac(X(k)+T,T)+eq+zMath(z))+`<p>02의 직교성과 같은 원리입니다. k=${k} 이외의 성분은 내적이 0이 됩니다.</p>`;

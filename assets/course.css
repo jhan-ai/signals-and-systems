@@ -24,3 +24,5 @@ select,.ss-control select{background:#fffefa;border-color:#cbcfbf;color:var(--in
 .course-footer{border-top:3px solid var(--course-red);color:#626a70;font-size:12px;margin-top:24px;letter-spacing:0;padding:17px 0}
 .ss-lab :focus-visible{outline-color:var(--course-red)}
 @media(max-width:780px){main{padding-top:22px}.definition{padding:15px 16px}.definition math{font-size:19px}h1{font-size:29px}.lead{font-size:14px}.course-reference{font-size:12px}.definition p{font-size:12px}.topbar{padding:12px 18px}.brand{font-size:13px}.tabs button{white-space:normal}.course-footer{gap:8px}}
+
+.course-nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;border-top:1px solid var(--line);margin-top:30px;padding:20px 0;font-size:15px}.course-nav a{color:var(--ink);text-underline-offset:4px}.course-nav a[rel=next]{margin-left:auto}.course-nav .course-nav-home{color:var(--course-red);font-weight:650}.course-nav :focus-visible{outline:3px solid var(--course-red);outline-offset:4px}@media(max-width:650px){.course-nav{align-items:flex-start;flex-direction:column}.course-nav a[rel=next]{margin-left:0}}
