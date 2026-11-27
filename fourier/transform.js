@@ -53,7 +53,7 @@
         <div class="ft-formula-box"><p class="ft-formula-label">단일 펄스의 변환 X(ω)와 반복 신호의 계수 Xₖ</p><div class="ft-formula">${bridgeFormula}</div></div>
         <div class="ft-note" role="status" aria-live="polite"><strong id="ft-bridge-insight"></strong><p id="ft-bridge-explanation"></p></div>
       </div></div>
-      <details class="ft-details"><summary>Xₖ, TXₖ, X(ω)는 어떻게 다른가요?</summary><div><p>Xₖ는 주기 신호의 푸리에 급수 계수입니다. T가 커질수록 계수 간 주파수 간격과 각 계수의 크기가 함께 작아집니다.</p><p>TXₖ는 관계를 비교하기 위해 계수에 T를 곱한 값입니다. ω = kω₀에서 단일 펄스의 푸리에 변환 X(ω)와 같습니다. 실제 계수 Xₖ가 그대로 연속 곡선이 되는 것은 아닙니다.</p><p>세로선은 급수 계수의 값을 나타냅니다. 주기 신호의 푸리에 변환에 나타나는 임펄스의 가중치는 2πXₖ입니다.</p><div class="ft-formula">${pairFormula}</div></div></details>
+      <details class="ft-details"><summary>급수 계수 Xₖ와 연속 스펙트럼 X(ω)의 관계</summary><div><p>k는 성분 번호이고 ω₀=2π/T는 기본 각주파수입니다. Xₖ는 각주파수 kω₀인 성분의 푸리에 급수 계수입니다. T가 커질수록 계수 간 주파수 간격과 각 계수의 크기가 함께 작아집니다.</p><p>TXₖ는 관계를 비교하기 위해 계수에 T를 곱한 값입니다. ω = kω₀에서 단일 펄스의 푸리에 변환 X(ω)와 같습니다. 실제 계수 Xₖ가 그대로 연속 곡선이 되는 것은 아닙니다.</p><p>세로선은 급수 계수의 값을 나타냅니다. 주기 신호의 푸리에 변환에 나타나는 impulse의 가중치는 2πXₖ입니다.</p><div class="ft-formula">${pairFormula}</div></div></details>
     </section>
     <section id="ft-panel-properties" class="ft-panel" role="tabpanel" aria-labelledby="ft-tab-properties" hidden>
       <p class="ft-intro">원래 신호 x(t)를 이동하거나 압축하며, 시간 파형과 크기·위상 스펙트럼을 함께 비교하세요.</p>
@@ -63,7 +63,7 @@
         <div class="ft-control"><label for="ft-shift">이동량 t₀ <output id="ft-shift-value">0 s</output></label><input id="ft-shift" type="range" min="-2" max="2" step="0.1" value="0"><p class="ft-control-note">t₀ &gt; 0이면 오른쪽으로 이동합니다.</p></div>
         <div class="ft-control"><label for="ft-amplitude">진폭 배율 A <output id="ft-amplitude-value">1</output></label><input id="ft-amplitude" type="range" min="0.5" max="2" step="0.1" value="1"></div>
         <div class="ft-presets"><button type="button" id="ft-preset-compress">2배 압축</button><button type="button" id="ft-preset-shift">1초 이동</button></div>
-        <div class="ft-control-message"><strong>한 번에 한 값씩 바꿔 보세요.</strong><p>이동은 위상에, 시간 배율은 스펙트럼의 폭과 높이에 반영됩니다.</p></div>
+        <div class="ft-control-message"><strong>이동·시간 배율·진폭 배율의 역할</strong><p>한 번에 한 값씩 바꾸면 각 효과를 구별하기 쉽습니다. 이동은 위상에, 시간 배율은 스펙트럼의 폭과 높이에 반영됩니다.</p></div>
       </aside><div class="ft-results">
         <div class="ft-formula-box"><div class="ft-formula">${propertyFormula}</div><p class="ft-caption">a &gt; 0인 경우입니다. 먼저 시간축을 a배 압축·확장한 뒤 t₀만큼 이동한 신호를 비교합니다.</p></div>
         ${graphCard('ft-properties-time', 'TIME DOMAIN', '원래 신호와 바꾼 신호', legend([['x(t)', 'ft-key-original'], ['y(t)', 'ft-key-blue']]))}
@@ -81,13 +81,13 @@
       <div class="ft-grid"><aside class="ft-controls"><div class="ft-controls-head"><h3>시스템 조절</h3><button type="button" class="ft-reset" id="ft-reset-response">초기화</button></div>
         <div class="ft-control"><label for="ft-input-mode">입력 신호</label><select id="ft-input-mode"><option value="sinusoids">두 정현파 · 정상상태</option><option value="pulse">사각 펄스 · 0~2초</option></select></div>
         <div class="ft-control"><label for="ft-cutoff">차단 각주파수 a <output id="ft-cutoff-value">1 rad/s</output></label><input id="ft-cutoff" type="range" min="0.25" max="5" step="0.25" value="1"><div class="ft-range-ends"><span>0.25 rad/s</span><span>5 rad/s</span></div></div>
-        <div class="ft-control-message"><strong>지수형 임펄스 응답</strong><div class="ft-formula">${math(mi('h') + wrap(t) + mo('=') + a + sup(mi('e'), mo('−') + a + t) + mi('u') + wrap(t))}</div><div class="ft-formula">${math(mi('H') + wrap(omega) + mo('=') + frac(a, a + mo('+') + mi('j') + omega))}</div><p>a를 줄이면 높은 주파수 성분이 더 많이 줄어듭니다.</p></div>
+        <div class="ft-control-message"><strong>지수형 impulse 응답</strong><div class="ft-formula">${math(mi('h') + wrap(t) + mo('=') + a + sup(mi('e'), mo('−') + a + t) + mi('u') + wrap(t))}</div><div class="ft-formula">${math(mi('H') + wrap(omega) + mo('=') + frac(a, a + mo('+') + mi('j') + omega))}</div><p>a를 줄이면 높은 주파수 성분이 더 많이 줄어듭니다.</p></div>
       </aside><div class="ft-results">
         <div class="ft-formula-box"><div class="ft-formula">${responseFormula}</div></div>
         ${graphCard('ft-response-time', 'INPUT → SYSTEM → OUTPUT', '입력과 출력 파형', legend([['입력 x(t)', 'ft-key-original'], ['출력 y(t)', 'ft-key-blue']]))}
         <div id="ft-response-input-equation" class="ft-formula"></div>
         <div class="ft-pair">
-          ${graphCard('ft-response-gain', 'MAGNITUDE RESPONSE', '주파수별 진폭 변화량', legend([['|H(ω)|', 'ft-key-blue']]), true)}
+          ${graphCard('ft-response-gain', 'MAGNITUDE RESPONSE', '주파수별 진폭비 |H(ω)|', legend([['|H(ω)|', 'ft-key-blue']]), true)}
           ${graphCard('ft-response-phase', 'PHASE RESPONSE', '주파수별 위상 변화량', legend([['∠H(ω)', 'ft-key-orange']]), true)}
         </div>
         <article class="ft-card" id="ft-response-components"><div class="ft-table-wrap"><table class="ft-table"><caption>각 정현파 성분의 변화</caption><thead><tr><th scope="col">각주파수 ω</th><th scope="col">입력 진폭</th><th scope="col">출력 진폭</th><th scope="col">위상 변화</th></tr></thead><tbody id="ft-response-rows"></tbody></table></div><p class="ft-caption">주파수는 그대로이고, 진폭에는 |H(ω)|를 곱하고 위상에는 ∠H(ω)를 더합니다.</p></article>
@@ -189,7 +189,7 @@
     $('ft-spacing-value').innerHTML = `${fmt(spacing)}<small>rad/s</small>`;
     $('ft-coefficient-zero').textContent = fmt(F.pulseCoefficient(1, period, 2, 0), 4);
     $('ft-normalized-zero').textContent = '2';
-    $('ft-bridge-insight').textContent = normalized ? '주기가 길어질수록 X(ω) 위의 점들이 촘촘해집니다.' : '주기가 길어지면 계수 간격과 계수 크기가 함께 줄어듭니다.';
+    $('ft-bridge-insight').textContent = normalized ? '주기 증가에 따른 주파수 간격 감소' : '주기 증가에 따른 계수 간격·크기 감소';
     $('ft-bridge-explanation').textContent = normalized ? `T = ${period} s에서 주파수 간격은 ${fmt(spacing)} rad/s입니다. 파란 점은 실제 계수에 T를 곱한 값이며, 회색 X(ω) 곡선 위에 놓입니다.` : `X₀ = 2/T = ${fmt(2 / period, 4)}입니다. 펄스 폭과 높이는 고정되어 있으므로, 반복 간격이 넓어질수록 한 주기의 평균값도 작아집니다.`;
   }
 
@@ -216,17 +216,17 @@
     $('ft-frequency-energy').textContent = `${fmt(originalEnergy)} → ${fmt(transformedEnergy)}`;
     const onlyShift = Math.abs(scale - 1) < 1e-9 && Math.abs(amplitude - 1) < 1e-9 && Math.abs(shift) > 1e-9;
     if (onlyShift) {
-      $('ft-properties-insight').textContent = '시간 이동은 크기 스펙트럼을 바꾸지 않습니다.';
+      $('ft-properties-insight').textContent = '시간 이동에 따른 위상 변화';
       $('ft-properties-explanation').textContent = `파형이 ${fmt(Math.abs(shift), 1)}초 ${shift > 0 ? '오른쪽' : '왼쪽'}으로 이동합니다. 위상에 −ωt₀가 더해지며 신호의 면적과 에너지는 같습니다.`;
     } else if (Math.abs(scale - 1) > 1e-9) {
-      $('ft-properties-insight').textContent = scale > 1 ? '시간축을 압축하면 스펙트럼이 넓어집니다.' : '시간축을 늘리면 스펙트럼이 좁아집니다.';
+      $('ft-properties-insight').textContent = scale > 1 ? '시간 압축과 스펙트럼 확장' : '시간 확장과 스펙트럼 압축';
       $('ft-properties-explanation').textContent = `시간 폭은 ${fmt(1 / scale)}배, 스펙트럼의 주파수축 폭은 ${fmt(scale)}배가 됩니다. 대응하는 변환값의 크기는 A/a = ${fmt(amplitude / scale)}배, 전체 에너지는 A²/a = ${fmt(ratio)}배입니다.`;
     } else if (Math.abs(amplitude - 1) > 1e-9) {
-      $('ft-properties-insight').textContent = '신호의 진폭 배율이 변환 결과에도 반영됩니다.';
+      $('ft-properties-insight').textContent = '진폭 배율에 따른 스펙트럼·에너지 변화';
       $('ft-properties-explanation').textContent = `진폭과 크기 스펙트럼은 ${fmt(amplitude)}배, 에너지는 ${fmt(ratio)}배입니다.${shift ? ` 이동량 ${fmt(shift)}초는 위상에도 반영됩니다.` : ''}`;
     } else {
-      $('ft-properties-insight').textContent = '먼저 ‘2배 압축’ 또는 ‘1초 이동’을 선택해 보세요.';
-      $('ft-properties-explanation').textContent = '현재는 x(t)와 y(t)가 같습니다. 회색 원래 신호를 기준으로 파란 파형과 스펙트럼의 변화를 비교합니다.';
+      $('ft-properties-insight').textContent = '원래 신호와 변형한 신호의 비교';
+      $('ft-properties-explanation').textContent = '현재는 x(t)와 y(t)가 같습니다. ‘2배 압축’ 또는 ‘1초 이동’을 선택해 보세요. 회색 원래 신호를 기준으로 파란 파형과 스펙트럼의 변화를 비교합니다.';
     }
   }
 
@@ -254,11 +254,11 @@
       return `<tr><td>${c.omega} rad/s</td><td>${c.amplitude}</td><td>${fmt(c.amplitude * h.magnitude)}</td><td>${fmt(h.phase)} rad</td></tr>`;
     }).join('');
     if (isPulse) {
-      $('ft-response-insight').textContent = '펄스가 끝난 뒤에도 출력은 바로 0이 되지 않습니다.';
+      $('ft-response-insight').textContent = '입력 종료 후 남아 있는 출력의 감쇠';
       $('ft-response-explanation').textContent = `0~2초에는 출력이 증가하고, 입력이 꺼진 뒤에는 남은 응답이 감쇠합니다. a = ${fmt(cutoff)}일 때 감쇠의 시간 척도는 1/a = ${fmt(1 / cutoff)}초입니다.`;
       $('ft-response-assumption').textContent = '초기 상태가 0인 시스템의 전체 응답입니다. y(t) = x(t) ∗ h(t)를 적분한 정확한 식으로 계산하며, t ≥ 2에서는 (1−e⁻²ᵃ)e⁻ᵃ⁽ᵗ⁻²⁾입니다.';
     } else {
-      $('ft-response-insight').textContent = '높은 주파수 성분이 더 작아지고, 각 성분의 위상도 달라집니다.';
+      $('ft-response-insight').textContent = '저역통과 필터의 진폭 감쇠와 위상 변화';
       $('ft-response-explanation').textContent = `1 rad/s 성분의 진폭비는 ${fmt(F.lowpass(1, cutoff).magnitude)}, 5 rad/s 성분의 진폭비는 ${fmt(F.lowpass(5, cutoff).magnitude)}입니다. 바뀐 두 성분을 더하면 파란 출력이 됩니다.`;
       $('ft-response-assumption').textContent = '입력이 충분히 오래 유지된 정현파 정상상태 응답입니다. t = 0에서 정현파를 켤 때의 과도응답은 이 모드에 포함하지 않습니다.';
     }

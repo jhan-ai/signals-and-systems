@@ -36,7 +36,7 @@
     "slug": "discrete-systems",
     "title": "이산 시스템",
     "chapter": "9장",
-    "description": "임펄스 응답에서 컨볼루션 합, 초기조건과 차분방정식까지 연결합니다.",
+    "description": "impulse 응답에서 convolution 합, 초기조건과 차분방정식까지 연결합니다.",
     "advanced": false
   },
   {

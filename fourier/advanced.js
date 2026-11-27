@@ -97,7 +97,7 @@ window.FourierLesson=(()=>{
    lines.push(math(X(k)+eq+frac(mn(A),mi('π')+wrap(mn(k)))+mi('sin')+wrap(frac(mi('π')+wrap(mn(k))+times+mn(w),mn(period)))+eq+mn(F.pulseCoefficient(A,period,w,k))));
   }
   lines.push(math(X('k')+eq+frac(mi('A')+mi('w'),T)+mi('sinc')+wrap(frac(mi('k')+mi('w'),T))));
-  lines.push('<p class="chart-note">sinc(v)=sin(πv)/(πv), sinc(0)=1. 예제 5-5에서는 A=2, T=4, w=2이므로 Xₖ=sinc(k/2)입니다.</p>');
+  lines.push('<p class="chart-note">이 급수 실험에서는 sinc(v)=sin(πv)/(πv), sinc(0)=1입니다. 주요 변환쌍 실험에서 사용하는 sin(z)/z와 인수가 다르므로 구분합니다. 예제 5-5에서는 A=2, T=4, w=2이므로 Xₖ=sinc(k/2)입니다.</p>');
   return lines.join('');
  }
  function series(){

@@ -104,3 +104,14 @@ This revision supersedes the earlier Fourier interactive design described above.
 - `site-consistency.test.cjs`: 627 checks, seven pages, 23 direct routes, 59 internal hyperlinks, zero script errors. Covers title and label cleanup after tab/option changes, sequential navigation, skip-link behavior, local assets and anchor targets.
 - Chrome preview: inspected desktop homepage plus narrow home, legacy Fourier and sampling pages at a 390px iframe width (375px content viewport). No document-level horizontal overflow; tabs and controls wrap, the common navigation stacks, and keyboard focus stays visible. Wide formulas scroll inside their own container. This does not establish physical touch-device or cross-browser coverage.
 - Test commands are available together through `npm run test:all`. Historical entries above describe earlier revisions, including superseded slide-reference labels.
+
+
+## 2026-11-27: Student-facing explanations and lecture terminology
+
+- Reviewed all published lesson sources against the eight supplied lecture decks. Kept existing calculations and controls; revised headings, explanations, graph labels, accessible names, option labels, homepage links and the catalog.
+- Expanded definitions of DTFS N/k/q and basis functions, convolution n/k and t/τ, complete-system impulse response, zero-state/zero-input decomposition, homogeneous/particular solutions, sampling replicas, quantization and Laplace convergence. Each explanation identifies what the symbols represent and which signals are compared.
+- Used phrase-based headings and lecture terms impulse, convolution, decimation and 0 삽입. Replaced equivalence wording with the response of the connected whole system. Explicitly distinguished the two existing sinc conventions and the different uses of N.
+- Fixed explanatory graph labels for Fourier properties: transformed signals now show y(t), Y(ω), or the dual pair X(t), 2πx(−ω) consistently. Magnitude response is labeled an amplitude ratio.
+- Existing UI suites passed (3,602 checks), site consistency passed (627 checks, seven pages, 23 direct routes, 59 internal links), and the 2,407-case sweep passed (547,459 assertions). No site script errors in DOM tests. After the last explanation/plot-label edits, reran the affected Fourier-series/new-lab UI suites and parameter sweep successfully.
+- One-off rendered-heading audit covered 84 page/tab/option states with no remaining sentence-style headings. Source scan found no deprecated requested terms in published HTML/JS/catalog text.
+- Chrome preview checked the system-connection explanation on desktop and DTFS / decimation in a 390px iframe (375px content width). Long explanations wrap, the controls work, and neither narrow page has document-level horizontal overflow. Physical touch devices and other browser engines were not tested in this revision.
