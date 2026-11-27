@@ -25,3 +25,20 @@ add('path',{d:`M40 280H${X(0)}L${X(1)} 205L${X(2)} 280H568`,stroke:'#45505b','st
 add('line',{x1:X(1.5),x2:X(1.5),y1:191,y2:280,stroke:'#007f9f','stroke-dasharray':'4 4'});
 add('circle',{cx:X(1.5),cy:242.5,r:5,fill:'#007f9f'});add('text',{x:X(1.5)+13,y:231,style:'fill:#007f9f'},'y(1.5) = 0.5');
 add('text',{x:10,y:206},'y(t)');for(const t of [0,1,2])add('text',{x:X(t),y:307,'text-anchor':'middle'},String(t));add('text',{x:578,y:307,'text-anchor':'end'},'t (s)');
+// Lecture extensions share the existing cream / slate / red visual language.
+document.querySelectorAll('[data-lesson-preview]').forEach(svg=>{
+ const kind=svg.dataset.lessonPreview,NS='http://www.w3.org/2000/svg';
+ const add=(tag,a,t)=>{const e=document.createElementNS(NS,tag);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));if(t)e.textContent=t;svg.append(e);};
+ const axis=(y,label)=>{add('line',{x1:42,x2:565,y1:y,y2:y,stroke:'#c9cbbc'});add('text',{x:42,y:y-74},label);};
+ const stem=(xs,ys,ybase,color)=>xs.forEach((x,i)=>{add('line',{x1:x,x2:x,y1:ybase,y2:ybase-ys[i]*42,stroke:color,'stroke-width':2.5});add('circle',{cx:x,cy:ybase-ys[i]*42,r:4,fill:color});});
+ const curve=(f,ybase,color)=>{let d='';for(let i=0;i<=520;i++)d+=(i?'L':'M')+(42+i)+','+(ybase-42*f(i/520));add('path',{d,fill:'none',stroke:color,'stroke-width':2.5});};
+ if(kind==='discrete'){axis(115,'샘플링: x(t)에서 x[n]으로');curve(t=>Math.cos(6*Math.PI*t),115,'#c4c2ae');stem(Array.from({length:13},(_,i)=>42+i*43.3),Array.from({length:13},(_,i)=>Math.cos(Math.PI*i/2)),115,'#007f9f');add('text',{x:42,y:220},'시간은 이산화하고, 샘플값을 기록합니다.');}
+ else if(kind==='dtfs'){axis(105,'시간 영역: N개의 샘플');stem(Array.from({length:16},(_,i)=>48+i*33),Array.from({length:16},(_,i)=>i%8<3?1:0),105,'#007f9f');axis(235,'주파수 영역: N개의 계수');const c=LectureMath.dtfs([1,1,1,0,0,0,0,0]);stem(Array.from({length:16},(_,i)=>48+i*33),Array.from({length:16},(_,i)=>LectureMath.abs(c[i%8])*2),235,'#c65327');}
+ else if(kind==='discrete-systems'){axis(110,'x[k]와 h[n−k]의 곱');stem(Array.from({length:9},(_,i)=>60+i*55),[0,0,1,2,1,0,0,0,0],110,'#007f9f');axis(240,'곱을 더한 결과 y[n]');stem(Array.from({length:9},(_,i)=>60+i*55),[0,0,.4,1.2,1.6,1.2,.4,0,0],240,'#c65327');}
+ else{axis(115,'시간 영역: 진폭 변조');curve(t=>Math.exp(-Math.abs(t-.5)*7)*Math.cos(60*t),115,'#007f9f');axis(240,'주파수 영역: 두 대역으로 이동');curve(t=>.85/(1+((t-.28)*25)**2)+.85/(1+((t-.72)*25)**2),240,'#c65327');}
+});
+document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{
+ document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+ let count=0;document.querySelectorAll('.lab-card').forEach(card=>{card.hidden=button.dataset.filter!=='all'&&card.dataset.domain!==button.dataset.filter;if(!card.hidden)count++;});
+ document.querySelector('.home-count').textContent=count+'개 실험실';
+}));

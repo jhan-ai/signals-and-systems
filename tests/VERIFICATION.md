@@ -83,3 +83,12 @@ This revision supersedes the earlier Fourier interactive design described above.
 - Chrome preview: desktop graph rendering and controls inspected for all three transform experiments. At T=16 the bridge displays Δω=0.393 rad/s, X₀=0.125 and T X₀=2. The 2× compression preset displays area and energy 2→1. The 0–2 s pulse produces the expected rise and decay.
 - Responsive check: a 390 px iframe (375 px content width with scrollbar) displayed stacked controls, MathML, SVG graphs and the series Parseval card without document-level horizontal overflow. The default pulse series at N=5 displayed P=2, P_N=1.9331 and 96.65%.
 - These rendering checks use desktop Chrome at two viewport widths. They do not establish physical-device touch behavior or cross-browser assistive-technology compatibility.
+
+
+## 2026-11-27: Week 8–13 lecture expansion
+
+- Four new labs, 18 tabs. New math tests cover known DTFS coefficients, arbitrary consecutive synthesis windows, Parseval, finite convolution, first-order resonance, initial-state superposition, quantization, sampled alias equality, and independent numerical quadrature of continuous transform pairs.
+- New DOM tests cover 203 states, including every tab and select option, slider endpoints, presets, reset, keyboard navigation, direct hashes, SVG downloads, finite coordinates, unique IDs, control labels, links, and home filters. Numerical UI assertions verify convolution, aliasing, DTFS reconstruction and recurrence/classical agreement.
+- Shared SVG renderer accepts optional width and integer x ticks. Existing callers retain their behavior. Existing math/UI suites run alongside the new tests.
+- Chrome preview visually checked the homepage filtering, sampling presets, spectral replication, DTFS, and 2nd-order repeated-root selection. At a 390px iframe width (375px content viewport after scrollbar), DTFS and classical-solution pages have no document horizontal overflow; controls stack and graphs remain readable. This checks a narrow rendered viewport, not a physical phone.
+- Browser-extension metadata errors were unrelated to the site's scripts; DOM integration tests found no site script errors.

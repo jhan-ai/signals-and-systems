@@ -14,5 +14,37 @@
     "chapter": "5·6장 · 주파수 영역 해석",
     "description": "급수의 합성·분석에서 연속 스펙트럼, 시간 변환과 주파수 응답까지 연결합니다.",
     "advanced": false
+  },
+  {
+    "number": 3,
+    "slug": "fourier-properties",
+    "title": "푸리에 변환의 성질과 필터",
+    "chapter": "6장 · Week 8–9",
+    "description": "변환쌍·쌍대성·변조·필터를 살펴보고 라플라스 변환으로 연결합니다.",
+    "advanced": false
+  },
+  {
+    "number": 4,
+    "slug": "discrete",
+    "title": "이산 신호와 샘플링",
+    "chapter": "8장 · Week 9–10",
+    "description": "샘플의 연산, 앨리어스, 샘플링 정리와 A/D 변환을 확인합니다.",
+    "advanced": false
+  },
+  {
+    "number": 5,
+    "slug": "discrete-systems",
+    "title": "이산 시스템",
+    "chapter": "9장 · Week 10–11",
+    "description": "임펄스 응답에서 컨볼루션 합, 초기조건과 차분방정식까지 연결합니다.",
+    "advanced": false
+  },
+  {
+    "number": 6,
+    "slug": "dtfs",
+    "title": "이산 시간 푸리에 급수",
+    "chapter": "10장 · Week 13",
+    "description": "N개의 성분을 분석·합성하며 주기성과 직교성을 확인합니다.",
+    "advanced": false
   }
 ]

@@ -6,7 +6,7 @@
   function svgNode(tag,attrs={},text){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,v);if(text!==undefined)n.textContent=text;return n;}
   let chartIndex=0;
   function plot(host,title,curves,opts={}){
-    const w=Math.max(320,Math.min(850,(host.clientWidth||742)-42)),l=57,r=20,b=42,top=24,h=opts.equal?w-l-r+top+b:(opts.height??280);
+    const w=Math.max(320,Math.min(850,opts.width??((host.clientWidth||742)-42))),l=57,r=20,b=42,top=24,h=opts.equal?w-l-r+top+b:(opts.height??280);
     const xmin=opts.xmin??-2,xmax=opts.xmax??4;
     const data=curves.map(c=>c.points||Array.from({length:701},(_,i)=>{const x=xmin+(xmax-xmin)*i/700;return [x,c.fn(x)];}));
     const ys=data.flat().map(p=>p[1]).filter(Number.isFinite);let ymin=opts.ymin??Math.min(0,...ys),ymax=opts.ymax??Math.max(0,...ys);
@@ -17,7 +17,7 @@
     const clipId='ss-clip-'+(++chartIndex),defs=svgNode('defs'),clip=svgNode('clipPath',{id:clipId});clip.append(svgNode('rect',{x:l,y:top,width:w-l-r,height:h-top-b}));defs.append(clip);svg.append(defs);
     const tick=(v,a,z,N)=>a+(z-a)*v/N;
     for(let j=0;j<=4;j++){const y=tick(j,ymin,ymax,4);svg.append(svgNode('line',{x1:l,x2:w-r,y1:Y(y),y2:Y(y),stroke:'#e0e7ee'}),svgNode('text',{x:l-8,y:Y(y)+4,'text-anchor':'end'},fmt(y,2)));}
-    for(let j=0;j<=6;j++){const x=tick(j,xmin,xmax,6);svg.append(svgNode('line',{x1:X(x),x2:X(x),y1:top,y2:h-b,stroke:'#edf1f5'}),svgNode('text',{x:X(x),y:h-b+20,'text-anchor':'middle'},fmt(x,2)));}
+    for(const x of (opts.xticks||Array.from({length:7},(_,j)=>tick(j,xmin,xmax,6)))){svg.append(svgNode('line',{x1:X(x),x2:X(x),y1:top,y2:h-b,stroke:'#edf1f5'}),svgNode('text',{x:X(x),y:h-b+20,'text-anchor':'middle'},fmt(x,2)));}
     if(ymin<=0&&ymax>=0)svg.append(svgNode('line',{x1:l,x2:w-r,y1:Y(0),y2:Y(0),stroke:'#94a5b4'}));
     if(xmin<=0&&xmax>=0)svg.append(svgNode('line',{x1:X(0),x2:X(0),y1:top,y2:h-b,stroke:'#94a5b4'}));
     svg.append(svgNode('text',{x:w-r,y:h-4,'text-anchor':'end'},opts.xlabel||'t (s)'),svgNode('text',{x:l,y:15},opts.ylabel||'진폭'));
